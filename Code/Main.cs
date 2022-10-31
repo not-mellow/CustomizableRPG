@@ -49,6 +49,7 @@ namespace CommissionMod
             UI.init();
             LeaderBoard.init();
             WorldTalentStats.init();
+            WorldLevelStats.init();
             if (!hasSettings)
             {
                 createStats();

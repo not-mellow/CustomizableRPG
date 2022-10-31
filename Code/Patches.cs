@@ -26,7 +26,7 @@ namespace CommissionMod
             harmony.Patch(AccessTools.Method(typeof(Actor), "getExpToLevelup"), 
             prefix: new HarmonyMethod(AccessTools.Method(typeof(Patches), "getExpToLevelup_Prefix")));
             harmony.Patch(AccessTools.Method(typeof(ActorStatus), "generateCivUnitTraits"), 
-            postfix: new HarmonyMethod(AccessTools.Method(typeof(Patches), "generateCivUnitTraits_Postfix")));
+            prefix: new HarmonyMethod(AccessTools.Method(typeof(Patches), "generateCivUnitTraits_Prefix")));
             harmony.Patch(AccessTools.Method(typeof(ActorBase), "updateStats"), 
             prefix: new HarmonyMethod(AccessTools.Method(typeof(Patches), "updateStats_Prefix")));
             harmony.Patch(AccessTools.Method(typeof(ActorStatus), "updateAge"), 
@@ -128,7 +128,7 @@ namespace CommissionMod
             return null;
         }
 
-        public static void generateCivUnitTraits_Postfix(ActorStatus __instance)
+        public static bool generateCivUnitTraits_Prefix(ActorStatus __instance)
         {
             bool flag = false;
             Dictionary<string, SavedTrait> reversedTalentIDS = Traits.talentIDs.Reverse().ToDictionary(x=>x.Key,x=>x.Value);
@@ -151,6 +151,7 @@ namespace CommissionMod
             {
                 __instance.addTrait("Frank");
             }
+            return true;
         }
 
         public static bool updateStats_Prefix(ActorBase __instance)

@@ -150,6 +150,32 @@ namespace CommissionMod
             );
 
             NCMS.Utils.PowerButtons.AddButtonToTab(talentStatsButton, NCMS.Utils.PowerTab.Main, new Vector2(590, 18));
+
+            PowerButton levelStatsButton = NCMS.Utils.PowerButtons.CreateButton(
+                "levelStatsButton",
+                NCMS.Utils.Sprites.LoadSprite($"{Mod.Info.Path}/icon.png"),
+                "World Level Stats",
+                "Click Here To See The Current Stats of Levels In The World!",
+                new Vector2(0, 0),
+                ButtonType.Click,
+                null,
+                WorldLevelStats.openWindow
+            );
+
+            NCMS.Utils.PowerButtons.AddButtonToTab(levelStatsButton, NCMS.Utils.PowerTab.Main, new Vector2(548, -18));
+
+            PowerButton spLevelButton = NCMS.Utils.PowerButtons.CreateButton(
+                "spLevelUp",
+                Mod.EmbededResources.LoadSprite($"{Mod.Info.Name}.Resources.UI.iconLevels.png"),
+                "Talent Leader Board",
+                "Create Rain That Would Set Unit's Levels To A Specific Value!",
+                new Vector2(0, 0),
+                ButtonType.GodPower,
+                null,
+                null
+            );
+
+            NCMS.Utils.PowerButtons.AddButtonToTab(spLevelButton, NCMS.Utils.PowerTab.Main, new Vector2(548, 18));
         }
         
         private static void addSettingsWindow(string id, string title)
