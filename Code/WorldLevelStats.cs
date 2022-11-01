@@ -61,7 +61,7 @@ namespace CommissionMod
             int index = 0;
             foreach(KeyValuePair<string, int> kv in levelStats)
             {
-                UI.addText($"{kv.Key}-{int.Parse(kv.Key) + 9} Level", statsContents, 10, new Vector3(60, -25 + (index*-25)));
+                UI.addText($"{kv.Key}-{int.Parse(kv.Key) + 9} Levels", statsContents, 10, new Vector3(60, -25 + (index*-25)));
                 UI.addText(kv.Value.ToString(), statsContents, 10, new Vector3(200, -25 + (index*-25)));
                 index++;
             }

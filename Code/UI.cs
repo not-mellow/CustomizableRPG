@@ -167,7 +167,7 @@ namespace CommissionMod
             PowerButton spLevelButton = NCMS.Utils.PowerButtons.CreateButton(
                 "spLevelUp",
                 Mod.EmbededResources.LoadSprite($"{Mod.Info.Name}.Resources.UI.iconLevels.png"),
-                "Talent Leader Board",
+                "Specific Level Up Rain",
                 "Create Rain That Would Set Unit's Levels To A Specific Value!",
                 new Vector2(0, 0),
                 ButtonType.GodPower,

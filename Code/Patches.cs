@@ -441,7 +441,7 @@ namespace CommissionMod
                 {
                     __instance.addTrait("eyepatch", false);
                 }
-                __instance.addExperience(1);
+                __instance.addExperience(-1);
             }
             if (pFlash)
             {
