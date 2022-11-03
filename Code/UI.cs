@@ -17,7 +17,7 @@ namespace CommissionMod
 {
     class UI : MonoBehaviour
     {
-        private static Dictionary<string, string> inputOptions = new Dictionary<string, string>();
+        public static Dictionary<string, string> inputOptions = new Dictionary<string, string>();
         public static Dictionary<string, bool> boolOptions = new Dictionary<string, bool>();
         private static GameObject settingContents;
 
@@ -77,7 +77,7 @@ namespace CommissionMod
             createStatOption(
                 "Damage Reduction Per Level Leap",
                 new List<string>{"DMGReductionPercent"},
-                -400,
+                -420,
                 new List<string>{"0.5"}
             );
 
@@ -87,7 +87,7 @@ namespace CommissionMod
                 createTraitOption(
                     kv.Key,
                     kv.Value,
-                    -500 + (-index*100)
+                    -520 + (-index*100)
                 );
                 index++;
             }
@@ -97,7 +97,7 @@ namespace CommissionMod
                 Mod.EmbededResources.LoadSprite($"{Mod.Info.Name}.Resources.UI.save_icon.png"),
                 "Save Changes",
                 "Save The Changes To The Settings",
-                new Vector2(130, -1850),
+                new Vector2(130, -1820),
                 ButtonType.Click,
                 settingContents.transform,
                 Main.saveStats
@@ -220,7 +220,8 @@ namespace CommissionMod
             NameInput nameInputComp = inputField.GetComponent<NameInput>();
             if (Main.hasSettings)
             {
-                textValue = Main.savedStats.inputOptions[objName];
+                // textValue = Main.savedStats.inputOptions[objName];
+                Main.getSavedOption(stat);
             }
             nameInputComp.setText(textValue);
             RectTransform inputRect = inputField.GetComponent<RectTransform>();
@@ -250,7 +251,7 @@ namespace CommissionMod
             statImage.sprite = Mod.EmbededResources.LoadSprite($"{Mod.Info.Name}.Resources.UI.windowInnerSliced.png");
             RectTransform statHolderRect = statHolder.GetComponent<RectTransform>();
             statHolderRect.localPosition = new Vector3(130, posY, 0);
-            statHolderRect.sizeDelta = new Vector2(600, 280);
+            statHolderRect.sizeDelta = new Vector2(/*600*/statNames.Count*200, 280);
 
             Text nameText = addText(objName, statHolder, 30, new Vector3(0, 105, 0));
             RectTransform nameTextRect = nameText.gameObject.GetComponent<RectTransform>();
@@ -271,7 +272,8 @@ namespace CommissionMod
                 string trueTextValue = null;
                 if (Main.hasSettings)
                 {
-                    trueTextValue = Main.savedStats.inputOptions[stat];
+                    // trueTextValue = Main.savedStats.inputOptions[stat];
+                    trueTextValue = Main.getSavedOption(stat);
                 }
                 else
                 {
@@ -356,7 +358,8 @@ namespace CommissionMod
         private static void changeInput(string inputName, InputField inputField)
         {
             int value = -1;
-            if (!float.TryParse(inputField.text, out value) || !int.TryParse(inputField.text, out value))
+            float fValue = -1f;
+            if (!float.TryParse(inputField.text, out fValue) || !int.TryParse(inputField.text, out value))
             {
                 return;
             }
@@ -399,14 +402,14 @@ namespace CommissionMod
             return textComp;
         }
 
-        public static string getOption(string option)
+        public static string getOption(string option, string value = "1")
         {
             if (inputOptions.ContainsKey(option))
             {
                 return inputOptions[option];
             }
-            inputOptions.Add(option, "1");
-            return "1";
+            inputOptions.Add(option, value);
+            return value;
         }
     }
 }
