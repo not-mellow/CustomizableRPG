@@ -136,6 +136,39 @@ namespace CommissionMod
                 0.5f,
                 550
             );
+            createTalentTrait(
+                "Sigma",
+                "ui/Icons/iconEXrank",
+                "Sigma Rank",
+                "The Highest Tier",
+                0f,
+                newStats,
+                1,
+                0f,
+                1
+            );
+            createTalentTrait(
+                "Omega",
+                "ui/Icons/iconEXrank",
+                "Omega Rank",
+                "The Highest Tier",
+                0f,
+                newStats,
+                1,
+                0f,
+                1
+            );
+            createTalentTrait(
+                "Zeta",
+                "ui/Icons/iconEXrank",
+                "Zeta Rank",
+                "The Highest Tier",
+                0f,
+                newStats,
+                1,
+                0f,
+                1
+            );
 
             addTalentList();
         }
