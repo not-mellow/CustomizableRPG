@@ -421,7 +421,7 @@ namespace CommissionMod
                 {
                     if ((int)(__instance.data.level/10) >(int)(pAttacker.a.data.level/10))
                     {
-                        pDamage *= 0.5f;
+                        pDamage *= UI.inputOptions["DMGReductionPercent"];
                     }
                 }
             }

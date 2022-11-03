@@ -17,7 +17,7 @@ namespace CommissionMod
 {
     class UI : MonoBehaviour
     {
-        public static Dictionary<string, string> inputOptions = new Dictionary<string, string>();
+        private static Dictionary<string, string> inputOptions = new Dictionary<string, string>();
         public static Dictionary<string, bool> boolOptions = new Dictionary<string, bool>();
         private static GameObject settingContents;
 
@@ -74,13 +74,20 @@ namespace CommissionMod
                 new List<string>{"75", "5", "5", "600"}
             );
 
+            createStatOption(
+                "Damage Reduction Per Level Leap",
+                new List<string>{"DMGReductionPercent"},
+                -400,
+                new List<string>{"0.5"}
+            );
+
             int index = 0;
             foreach(KeyValuePair<string, SavedTrait> kv in Traits.talentIDs)
             {
                 createTraitOption(
                     kv.Key,
                     kv.Value,
-                    -420 + (-index*100)
+                    -500 + (-index*100)
                 );
                 index++;
             }
@@ -90,7 +97,7 @@ namespace CommissionMod
                 Mod.EmbededResources.LoadSprite($"{Mod.Info.Name}.Resources.UI.save_icon.png"),
                 "Save Changes",
                 "Save The Changes To The Settings",
-                new Vector2(130, -1390),
+                new Vector2(130, -1850),
                 ButtonType.Click,
                 settingContents.transform,
                 Main.saveStats
@@ -349,7 +356,7 @@ namespace CommissionMod
         private static void changeInput(string inputName, InputField inputField)
         {
             int value = -1;
-            if (!int.TryParse(inputField.text, out value))
+            if (!float.TryParse(inputField.text, out value) || !int.TryParse(inputField.text, out value))
             {
                 return;
             }
@@ -390,6 +397,16 @@ namespace CommissionMod
             textRect.sizeDelta = new Vector2(textComp.preferredWidth, textComp.preferredHeight);
         
             return textComp;
+        }
+
+        public static string getOption(string option)
+        {
+            if (inputOptions.ContainsKey(option))
+            {
+                return inputOptions[option];
+            }
+            inputOptions.Add(option, "1");
+            return "1";
         }
     }
 }
