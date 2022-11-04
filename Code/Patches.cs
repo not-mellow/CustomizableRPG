@@ -419,9 +419,9 @@ namespace CommissionMod
                 pDamage *= num;
                 if (pAttacker != null && pAttacker != __instance && pAttacker.isActor())
                 {
-                    if ((int)(__instance.data.level/10) >(int)(pAttacker.a.data.level/10))
+                    if ((int)(__instance.data.level/10) > (int)(pAttacker.a.data.level/10) && __instance.data.level >= int.Parse(UI.getOption("InitialLevel")))
                     {
-                        pDamage *= float.Parse(UI.getOption("DMGReductionPercent")) - 1f;
+                        pDamage *= 1f - float.Parse(UI.getOption("DMGReductionPercent"));
                     }
                 }
             }

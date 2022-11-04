@@ -138,7 +138,7 @@ namespace CommissionMod
             );
             createTalentTrait(
                 "Sigma",
-                "ui/Icons/iconEXrank",
+                "ui/Icons/iconSigmarank",
                 "Sigma Rank",
                 "The Highest Tier",
                 0f,
@@ -149,7 +149,7 @@ namespace CommissionMod
             );
             createTalentTrait(
                 "Omega",
-                "ui/Icons/iconEXrank",
+                "ui/Icons/iconOmegarank",
                 "Omega Rank",
                 "The Highest Tier",
                 0f,
@@ -160,7 +160,7 @@ namespace CommissionMod
             );
             createTalentTrait(
                 "Zeta",
-                "ui/Icons/iconEXrank",
+                "ui/Icons/iconZetarank",
                 "Zeta Rank",
                 "The Highest Tier",
                 0f,

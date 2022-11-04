@@ -75,10 +75,10 @@ namespace CommissionMod
             );
 
             createStatOption(
-                "Damage Reduction Per Level Leap",
-                new List<string>{"DMGReductionPercent"},
+                "DMG Reduction Per LVL Leap",
+                new List<string>{"InitialLevel", "DMGReductionPercent"},
                 -420,
-                new List<string>{"0.5"}
+                new List<string>{"10", "0.5"}
             );
 
             int index = 0;
@@ -221,7 +221,7 @@ namespace CommissionMod
             if (Main.hasSettings)
             {
                 // textValue = Main.savedStats.inputOptions[objName];
-                Main.getSavedOption(stat);
+                Main.getSavedOption(objName, textValue);
             }
             nameInputComp.setText(textValue);
             RectTransform inputRect = inputField.GetComponent<RectTransform>();
@@ -251,7 +251,7 @@ namespace CommissionMod
             statImage.sprite = Mod.EmbededResources.LoadSprite($"{Mod.Info.Name}.Resources.UI.windowInnerSliced.png");
             RectTransform statHolderRect = statHolder.GetComponent<RectTransform>();
             statHolderRect.localPosition = new Vector3(130, posY, 0);
-            statHolderRect.sizeDelta = new Vector2(/*600*/statNames.Count*200, 280);
+            statHolderRect.sizeDelta = new Vector2(600, 150 + (statNames.Count*40));
 
             Text nameText = addText(objName, statHolder, 30, new Vector3(0, 105, 0));
             RectTransform nameTextRect = nameText.gameObject.GetComponent<RectTransform>();
@@ -273,7 +273,7 @@ namespace CommissionMod
                 if (Main.hasSettings)
                 {
                     // trueTextValue = Main.savedStats.inputOptions[stat];
-                    trueTextValue = Main.getSavedOption(stat);
+                    trueTextValue = Main.getSavedOption(stat, textValues[index]);
                 }
                 else
                 {
@@ -359,11 +359,10 @@ namespace CommissionMod
         {
             int value = -1;
             float fValue = -1f;
-            if (!float.TryParse(inputField.text, out fValue) || !int.TryParse(inputField.text, out value))
+            if (float.TryParse(inputField.text, out fValue) || int.TryParse(inputField.text, out value))
             {
-                return;
+                inputOptions[inputName] = inputField.text;
             }
-            inputOptions[inputName] = inputField.text;
         }
 
         private static void changeTraitInput(string inputName, FieldInfo field, InputField inputField, bool isInt)
