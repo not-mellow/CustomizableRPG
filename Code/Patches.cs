@@ -86,11 +86,11 @@ namespace CommissionMod
             if (talentID != null)
             {
                 expGain = Traits.talentIDs[talentID].expGain;
-                if (pValue < 0)
-                {
-                    expGain = 0;
-                    pValue = Math.Abs(pValue);
-                }
+            }
+            if (pValue < 0)
+            {
+                expGain = 0;
+                pValue = Math.Abs(pValue);
             }
             int expToLevelup = __instance.getExpToLevelup();
             __instance.data.experience += pValue + expGain;
@@ -441,7 +441,7 @@ namespace CommissionMod
                 {
                     __instance.addTrait("eyepatch", false);
                 }
-                __instance.addExperience(-1);
+                __instance.addExperience((int)(float.Parse(UI.getOption("getHitOption"))*-1f));
             }
             if (pFlash)
             {

@@ -75,10 +75,19 @@ namespace CommissionMod
             );
 
             createStatOption(
-                "DMG Reduction Per LVL Leap",
+                "DMG Reduct Per LVL Leap",
                 new List<string>{"InitialLevel", "DMGReductionPercent"},
                 -420,
                 new List<string>{"10", "0.5"}
+            );
+
+            createInputOption(
+                "getHitOption",
+                "Exp Gained From Getting Hit",
+                "Modify The Percentage On How Much Exp A Unit Gets When Hit.",
+                -500,
+                settingContents,
+                "0.1"
             );
 
             int index = 0;
@@ -87,7 +96,7 @@ namespace CommissionMod
                 createTraitOption(
                     kv.Key,
                     kv.Value,
-                    -520 + (-index*100)
+                    -590 + (-index*100)
                 );
                 index++;
             }
@@ -97,7 +106,7 @@ namespace CommissionMod
                 Mod.EmbededResources.LoadSprite($"{Mod.Info.Name}.Resources.UI.save_icon.png"),
                 "Save Changes",
                 "Save The Changes To The Settings",
-                new Vector2(130, -1820),
+                new Vector2(130, -1860),
                 ButtonType.Click,
                 settingContents.transform,
                 Main.saveStats
