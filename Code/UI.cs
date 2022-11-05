@@ -230,7 +230,7 @@ namespace CommissionMod
             if (Main.hasSettings)
             {
                 // textValue = Main.savedStats.inputOptions[objName];
-                Main.getSavedOption(objName, textValue);
+                textValue = Main.getSavedOption(objName, textValue);
             }
             nameInputComp.setText(textValue);
             RectTransform inputRect = inputField.GetComponent<RectTransform>();
