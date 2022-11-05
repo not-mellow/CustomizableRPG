@@ -84,7 +84,7 @@ namespace CommissionMod
             createInputOption(
                 "getHitOption",
                 "Exp Gained From Getting Hit",
-                "Modify The Percentage On How Much Exp A Unit Gets When Hit.",
+                "Modify How Much Exp A Unit Gets When Hit By Someone.",
                 -500,
                 settingContents,
                 "1"
