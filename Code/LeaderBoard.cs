@@ -20,6 +20,9 @@ namespace CommissionMod
         private static GameObject boardContents;
         private static Dictionary<string, int> talentPriority = new Dictionary<string, int>
         {
+            {"Zeta", 13},
+            {"Sigma", 12},
+            {"Omega", 11},
             {"EXrank", 10},
             {"SSSrank", 9},
             {"SSrank", 8},
