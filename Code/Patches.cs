@@ -46,7 +46,7 @@ namespace CommissionMod
         public static bool getExpToLevelup_Prefix(Actor __instance, ref int __result)
         {
             int initialexp = 0;
-            int expGap = int.Parse(UI.inputOptions["expGapOption"]);
+            int expGap = int.Parse(UI.getOption("expGapOption"));
             if (expGap <= -1)
             {
                 expGap = 20;
@@ -71,7 +71,7 @@ namespace CommissionMod
             {
                 return false;
             }
-            int capValue = int.Parse(UI.inputOptions["levelCapOption"]);
+            int capValue = int.Parse(UI.getOption("levelCapOption"));
             if (capValue > -1 && __instance.data.level >= capValue)
             {
                 return false;
@@ -86,11 +86,11 @@ namespace CommissionMod
             if (talentID != null)
             {
                 expGain = Traits.talentIDs[talentID].expGain;
-                if (pValue < 0)
-                {
-                    expGain = 0;
-                    pValue = Math.Abs(pValue);
-                }
+            }
+            if (pValue < 0)
+            {
+                expGain = 0;
+                pValue = Math.Abs(pValue);
             }
             int expToLevelup = __instance.getExpToLevelup();
             __instance.data.experience += pValue + expGain;
@@ -419,9 +419,9 @@ namespace CommissionMod
                 pDamage *= num;
                 if (pAttacker != null && pAttacker != __instance && pAttacker.isActor())
                 {
-                    if ((int)(__instance.data.level/10) >(int)(pAttacker.a.data.level/10))
+                    if ((int)(__instance.data.level/10) > (int)(pAttacker.a.data.level/10) && __instance.data.level >= int.Parse(UI.getOption("InitialLevel")))
                     {
-                        pDamage *= 0.5f;
+                        pDamage *= 1f - float.Parse(UI.getOption("DMGReductionPercent"));
                     }
                 }
             }
@@ -441,7 +441,7 @@ namespace CommissionMod
                 {
                     __instance.addTrait("eyepatch", false);
                 }
-                __instance.addExperience(-1);
+                __instance.addExperience(int.Parse(UI.getOption("getHitOption"))*-1);
             }
             if (pFlash)
             {

@@ -74,13 +74,29 @@ namespace CommissionMod
                 new List<string>{"75", "5", "5", "600"}
             );
 
+            createStatOption(
+                "DMG Reduct Per LVL Leap",
+                new List<string>{"InitialLevel", "DMGReductionPercent"},
+                -420,
+                new List<string>{"10", "0.5"}
+            );
+
+            createInputOption(
+                "getHitOption",
+                "Exp Gained From Getting Hit",
+                "Modify How Much Exp A Unit Gets When Hit By Someone.",
+                -500,
+                settingContents,
+                "1"
+            );
+
             int index = 0;
             foreach(KeyValuePair<string, SavedTrait> kv in Traits.talentIDs)
             {
                 createTraitOption(
                     kv.Key,
                     kv.Value,
-                    -420 + (-index*100)
+                    -590 + (-index*100)
                 );
                 index++;
             }
@@ -90,7 +106,7 @@ namespace CommissionMod
                 Mod.EmbededResources.LoadSprite($"{Mod.Info.Name}.Resources.UI.save_icon.png"),
                 "Save Changes",
                 "Save The Changes To The Settings",
-                new Vector2(130, -1390),
+                new Vector2(130, -1860),
                 ButtonType.Click,
                 settingContents.transform,
                 Main.saveStats
@@ -213,7 +229,8 @@ namespace CommissionMod
             NameInput nameInputComp = inputField.GetComponent<NameInput>();
             if (Main.hasSettings)
             {
-                textValue = Main.savedStats.inputOptions[objName];
+                // textValue = Main.savedStats.inputOptions[objName];
+                textValue = Main.getSavedOption(objName, textValue);
             }
             nameInputComp.setText(textValue);
             RectTransform inputRect = inputField.GetComponent<RectTransform>();
@@ -243,7 +260,7 @@ namespace CommissionMod
             statImage.sprite = Mod.EmbededResources.LoadSprite($"{Mod.Info.Name}.Resources.UI.windowInnerSliced.png");
             RectTransform statHolderRect = statHolder.GetComponent<RectTransform>();
             statHolderRect.localPosition = new Vector3(130, posY, 0);
-            statHolderRect.sizeDelta = new Vector2(600, 280);
+            statHolderRect.sizeDelta = new Vector2(600, 150 + (statNames.Count*40));
 
             Text nameText = addText(objName, statHolder, 30, new Vector3(0, 105, 0));
             RectTransform nameTextRect = nameText.gameObject.GetComponent<RectTransform>();
@@ -264,7 +281,8 @@ namespace CommissionMod
                 string trueTextValue = null;
                 if (Main.hasSettings)
                 {
-                    trueTextValue = Main.savedStats.inputOptions[stat];
+                    // trueTextValue = Main.savedStats.inputOptions[stat];
+                    trueTextValue = Main.getSavedOption(stat, textValues[index]);
                 }
                 else
                 {
@@ -349,11 +367,11 @@ namespace CommissionMod
         private static void changeInput(string inputName, InputField inputField)
         {
             int value = -1;
-            if (!int.TryParse(inputField.text, out value))
+            float fValue = -1f;
+            if (float.TryParse(inputField.text, out fValue) || int.TryParse(inputField.text, out value))
             {
-                return;
+                inputOptions[inputName] = inputField.text;
             }
-            inputOptions[inputName] = inputField.text;
         }
 
         private static void changeTraitInput(string inputName, FieldInfo field, InputField inputField, bool isInt)
@@ -390,6 +408,16 @@ namespace CommissionMod
             textRect.sizeDelta = new Vector2(textComp.preferredWidth, textComp.preferredHeight);
         
             return textComp;
+        }
+
+        public static string getOption(string option, string value = "1")
+        {
+            if (inputOptions.ContainsKey(option))
+            {
+                return inputOptions[option];
+            }
+            inputOptions.Add(option, value);
+            return value;
         }
     }
 }

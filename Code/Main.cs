@@ -95,6 +95,16 @@ namespace CommissionMod
                 actor.setStatsDirty();
             }
         }
+
+        public static string getSavedOption(string option, string value = "1")
+        {
+            if (savedStats.inputOptions.ContainsKey(option))
+            {
+                return savedStats.inputOptions[option];
+            }
+            savedStats.inputOptions.Add(option, value);
+            return value;
+        }
     }
 
     public class SavedStats
