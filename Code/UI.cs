@@ -87,7 +87,7 @@ namespace CommissionMod
                 "Modify The Percentage On How Much Exp A Unit Gets When Hit.",
                 -500,
                 settingContents,
-                "0.1"
+                "1"
             );
 
             int index = 0;
