@@ -188,7 +188,7 @@ namespace CommissionMod
                 group = TraitGroup.Genetic,
                 type = TraitType.Positive
             };
-            if (Main.hasSettings)
+            if (Main.hasSettings && Main.savedStats.traits.ContainsKey(talent.id))
             {
                 talent.birth = Main.savedStats.traits[talent.id].spawnRate;
             }
