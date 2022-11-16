@@ -48,6 +48,7 @@ namespace CommissionMod
             Traits.init();
             UI.init();
             LeaderBoard.init();
+            FilterWindow.init();
             WorldTalentStats.init();
             WorldLevelStats.init();
             if (!hasSettings)

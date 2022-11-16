@@ -18,6 +18,7 @@ namespace CommissionMod
     class LeaderBoard : MonoBehaviour
     {
         private static GameObject boardContents;
+        private static GameObject scrollView;
         private static Dictionary<string, int> talentPriority = new Dictionary<string, int>
         {
             {"Zeta", 12},
@@ -34,37 +35,58 @@ namespace CommissionMod
             {"Erank", 2},
             {"Frank", 1},
         };
+        public static List<ToggleIcon> toggles = new List<ToggleIcon>();
+        public static Dictionary<string, bool> filterToggles = new Dictionary<string, bool>();
+
         public static void init()
         {
             addLeaderBoardWindow("leaderBoardWindow", "Talent Leader Board");
+            Button levelButton = createBGButton(scrollView, "levels", 50, "Levels", "LevelsFilter", "Search Units By Level");
+            levelButton.onClick.AddListener(() => searchUnits("levels", getUnitList()));
+            Button talentButton = createBGButton(scrollView, "talents", 20, "Talents", "TalentsFilter", "Search Units By Talent");
+            talentButton.onClick.AddListener(() => searchUnits("talents", getUnitList()));
+            Button killsButton = createBGButton(scrollView, "kills", -10, "Kills", "KillsFilter", "Search Units By Kills");
+            killsButton.onClick.AddListener(() => searchUnits("kills", getUnitList()));
+            Button filterButton = createBGButton(scrollView, "kingdomFilter", -40, "Talents", "KingdomFilter", "Search Units By Filter");
+            filterButton.onClick.AddListener(FilterWindow.openKingdomWindow);
+        }
+
+        private static List<Actor> getUnitList()
+        {
+            if (FilterWindow.kingdomFilter == null)
+            {
+                return MapBox.instance.units.getSimpleList();
+            }
+            return FilterWindow.kingdomFilter.units.getSimpleList();
         }
 
         public static void openWindow()
         {
-            searchUnits("talents");
             Windows.ShowWindow("leaderBoardWindow");
         }
 
-        public static void searchUnits(string sortName)
+        public static void searchUnits(string sortName, List<Actor> unitList)
         {
             foreach(Transform child in boardContents.transform)
             {
                 Destroy(child.gameObject);
             }
-            List<Actor> filteredList = sortUnits(sortName);
+            List<Actor> filteredList = sortUnits(sortName, unitList);
             RectTransform contentRect = boardContents.GetComponent<RectTransform>();
             contentRect.sizeDelta = new Vector2(0, 207 + (filteredList.Count * 70));
             for(int i = 0; i < filteredList.Count; i++)
             {
                 Actor actor = filteredList[i];
-                addNewWindowElement(i, actor);
+                if (actor == null)
+                {
+                    continue;
+                }
+                addNewWindowElement(i, actor, sortName);
             }
-
         }
 
-        public static List<Actor> sortUnits(string sortName)
+        public static List<Actor> sortUnits(string sortName, List<Actor> unitList)
         {
-            List<Actor> unitList = MapBox.instance.units.getSimpleList();
             List<Actor> copiedList = unitList.ToList();
             List<Actor> filteredList = new List<Actor>();
             int listCount = unitList.Count;
@@ -88,6 +110,15 @@ namespace CommissionMod
                     {
                         case "talents":
                             num2 = talentPriority[talent];
+                            break;
+                        case "levels":
+                            num2 = actor2.data.level;
+                            break;
+                        case "kills":
+                            num2 = actor2.data.kills;
+                            break;
+                        case "nothing":
+                            num2 = 0;
                             break;
                         default:
                             return unitList;
@@ -128,7 +159,7 @@ namespace CommissionMod
             return null;
         }
 
-        public static void addNewWindowElement(int i, Actor actor)
+        public static void addNewWindowElement(int i, Actor actor, string sorting)
         {
             GameObject bgElement = new GameObject("WindowElement");
             bgElement.transform.SetParent(boardContents.transform);
@@ -149,22 +180,23 @@ namespace CommissionMod
 
             int posY = 5;
             GameObject numText = UI.addText($"{(i+1).ToString()}.", bgElement, 50, new Vector3(-200, -5, 0)).gameObject;
-            string[] talent = hasTalent(actor.data).Split('r');
-            GameObject talentText = UI.addText($"{talent[0]}", bgElement, 50, new Vector3(140, 5, 0)).gameObject;
-            // GameObject dmgText = UI.addText($"DMG: {Toolbox.formatNumber(actor.curStats.damage)}", bgElement, 25, new Vector3(70, 20, 0)).gameObject;
-            // GameObject killsText = UI.addText($"KILLS: {Toolbox.formatNumber(actor.data.kills)}", bgElement, 25, new Vector3(180, 20, 0)).gameObject;
-            // GameObject lvlText = UI.addText($"LVL: {actor.data.level.ToString()}", bgElement, 25, new Vector3(70, -25, 0)).gameObject;
-            // GameObject ageText = UI.addText($"AGE: {actor.data.age.ToString()}", bgElement, 25, new Vector3(180, -25, 0)).gameObject;
-
-            // GameObject inspectButton = new GameObject("inspectButton");
-            // inspectButton.transform.SetParent(boardContents.transform);
-            // Image inspectImage = inspectButton.AddComponent<Image>();
-            // inspectImage.sprite = Mod.EmbededResources.LoadSprite($"{Mod.Info.Name}.Resources.Icons.iconSpectate.png");
-            // RectTransform inspectRect = inspectButton.GetComponent<RectTransform>();
-            // inspectRect.sizeDelta = new Vector2(80, 80);
-            // inspectRect.localPosition = new Vector3(180, -40 + (i*-50) );
-            // Button inspectButtonComp = inspectButton.AddComponent<Button>();
-            // inspectButtonComp.onClick.AddListener(() => avatarOnClick(actor));
+            switch(sorting)
+            {
+                case "talents":
+                    string[] talent = hasTalent(actor.data).Split('r');
+                    GameObject talentText = UI.addText($"{talent[0]}", bgElement, 50, new Vector3(140, 5, 0)).gameObject;
+                    break;
+                case "levels":
+                    GameObject levelsText = UI.addText($"{actor.data.level}", bgElement, 50, new Vector3(140, 5, 0)).gameObject;
+                    break;
+                case "kills":
+                    GameObject killsText = UI.addText($"{actor.data.kills}", bgElement, 50, new Vector3(140, 5, 0)).gameObject;
+                    break;
+                default:
+                    string[] actortalent = hasTalent(actor.data).Split('r');
+                    GameObject defaultText = UI.addText($"{actortalent[0]}", bgElement, 50, new Vector3(140, 5, 0)).gameObject;
+                    break;
+            }
         }
 
         public static GameObject createAvatar(Actor actor, GameObject parent, int size, Vector3 pos)
@@ -218,10 +250,61 @@ namespace CommissionMod
             ScrollWindow window;
             window = Windows.CreateNewWindow(id, title);
 
-            var scrollView = GameObject.Find($"/Canvas Container Main/Canvas - Windows/windows/{window.name}/Background/Scroll View");
+            scrollView = GameObject.Find($"/Canvas Container Main/Canvas - Windows/windows/{window.name}/Background/Scroll View");
             scrollView.gameObject.SetActive(true);
 
             boardContents = GameObject.Find($"/Canvas Container Main/Canvas - Windows/windows/{window.name}/Background/Scroll View/Viewport/Content");
+        }
+
+        public static Button createBGButton(GameObject parent, string name, int posY, string iconName, string buttonName, string buttonDesc)
+        {
+            PowerButton button = PowerButtons.CreateButton(
+                buttonName,
+                Mod.EmbededResources.LoadSprite($"{Mod.Info.Name}.Resources.Icons.icon{iconName}.png"),
+                buttonName,
+                buttonDesc,
+                new Vector2(118, posY),
+                ButtonType.Click,
+                parent.transform,
+                null
+            );
+
+            Image buttonBG = button.gameObject.GetComponent<Image>();
+            buttonBG.sprite = Mod.EmbededResources.LoadSprite($"{Mod.Info.Name}.Resources.UI.backgroundTabButton.png");
+            Button buttonButton = button.gameObject.GetComponent<Button>();
+
+            GameObject toggleHolder = new GameObject("ToggleIcon");
+            toggleHolder.transform.SetParent(button.gameObject.transform);
+            Image toggleImage = toggleHolder.AddComponent<Image>();
+            ToggleIcon toggleIcon = toggleHolder.AddComponent<ToggleIcon>();
+            toggleIcon.spriteON = Mod.EmbededResources.LoadSprite($"{Mod.Info.Name}.Resources.UI.buttonToggleIndicator0.png");
+            toggleIcon.spriteOFF = Mod.EmbededResources.LoadSprite($"{Mod.Info.Name}.Resources.UI.buttonToggleIndicator1.png");
+            toggleIcon.updateIcon(false);
+
+            RectTransform toggleRect = toggleHolder.GetComponent<RectTransform>();
+            toggleRect.localPosition = new Vector3(0, 12, 0);
+            toggleRect.sizeDelta = new Vector2(8, 7);
+
+            toggles.Add(toggleIcon);
+            filterToggles.Add(name, false);
+            buttonButton.onClick.AddListener(() => checkToggledIcon(toggleIcon, name));
+
+            return buttonButton;
+        }
+
+        public static void checkToggledIcon(ToggleIcon toggleIcon, string name)
+        {
+            foreach(ToggleIcon toggle in toggles)
+            {
+                toggle.updateIcon(false);
+            }
+            toggleIcon.updateIcon(true);
+            for(int i = 0; i < filterToggles.Count; i++)
+            {
+                KeyValuePair<string, bool> kv = filterToggles.ElementAt(i);
+                filterToggles[kv.Key] = false;
+            }
+            filterToggles[name] = true;
         }
     }
 }
