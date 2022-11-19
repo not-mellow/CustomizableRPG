@@ -51,6 +51,7 @@ namespace CommissionMod
             FilterWindow.init();
             WorldTalentStats.init();
             WorldLevelStats.init();
+            StatLimitWindow.init();
             if (!hasSettings)
             {
                 createStats();

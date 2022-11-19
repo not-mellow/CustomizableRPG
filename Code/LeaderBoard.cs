@@ -185,7 +185,7 @@ namespace CommissionMod
             bgRect.localPosition = new Vector3(130, -40 + (i*-60), 0);
             bgRect.sizeDelta = new Vector2(450, 140);
 
-            GameObject avatar = createAvatar(actor, bgElement, 30,  new Vector3(-50, -70, 0));
+            GameObject avatar = createAvatar(actor, bgElement, 30,  new Vector3(-110, -70, 0));
 
             int nameSize = 30;
             if (actor.getName().Length > 6)
@@ -219,6 +219,7 @@ namespace CommissionMod
                     GameObject defaultText = UI.addText($"{actortalent[0]}", bgElement, 50, new Vector3(140, 5, 0)).gameObject;
                     break;
             }
+            createBanner(bgElement, actor.city, new Vector2(80, 80), new Vector3(0, 0, 0));
         }
 
         public static GameObject createAvatar(Actor actor, GameObject parent, int size, Vector3 pos)
@@ -265,6 +266,60 @@ namespace CommissionMod
         {
             Config.selectedUnit = actor;
             Windows.ShowWindow("inspect_unit");
+        }
+
+        public static GameObject createBanner(GameObject parent, City city, Vector2 size, Vector3 pos)
+        {
+            if (city == null)
+            {
+                return null;
+            }
+            Kingdom kingdom = city.kingdom;
+            GameObject bannerGO = new GameObject("bannerHolder");
+            bannerGO.transform.SetParent(parent.transform);
+            bannerGO.AddComponent<CanvasRenderer>();
+            bannerGO.transform.localPosition = pos;
+
+            if (kingdom == null)
+            {
+                return null;
+            }
+            else if (kingdom.id == "nomads_human" || kingdom.id == "nomads_elf" || kingdom.id == "nomads_orc" || kingdom.id == "nomads_dwarf" || kingdom.id == "mad")
+            {
+                return null;
+            }
+
+            GameObject backgroundGO = new GameObject("background");
+            backgroundGO.transform.SetParent(bannerGO.transform);
+            Image backgroundImage = backgroundGO.AddComponent<Image>();
+            RectTransform bgRect = backgroundGO.GetComponent<RectTransform>();
+            bgRect.localPosition = new Vector3(0, 0, 0);
+            bgRect.sizeDelta = size;
+
+            GameObject iconGO = new GameObject("icon");
+            iconGO.transform.SetParent(bannerGO.transform);
+            Image iconImage = iconGO.AddComponent<Image>();
+            RectTransform iconRect = iconGO.GetComponent<RectTransform>();
+            iconRect.localPosition = new Vector3(0, 0, 0);
+            iconRect.sizeDelta = size;
+
+            BannerLoader bannerLoader = bannerGO.AddComponent<BannerLoader>();
+            bannerLoader.partIcon = iconImage;
+            bannerLoader.partBackround = backgroundImage;
+            bannerLoader.load(kingdom);
+
+            Button bannerButton = bannerGO.AddComponent<Button>();
+            bannerButton.onClick.AddListener(() => bannerOnClick(city));
+
+            UI.addText(city.data.cityName, bannerGO, 20, new Vector3(0, -50, 0));
+
+            return bannerGO;
+        }
+
+        private static void bannerOnClick(City city)
+        {
+            Config.selectedCity = city;
+            Windows.ShowWindow("village");
         }
 
         private static void addLeaderBoardWindow(string id, string title)

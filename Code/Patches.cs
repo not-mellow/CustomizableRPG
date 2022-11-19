@@ -378,10 +378,20 @@ namespace CommissionMod
             __instance.attackTimer = 0f;
             __instance.updateTargetScale();
             __instance.curStats.normalize();
+            // Stat limit this
+            limitStats(__instance.curStats);
             __instance.currentScale.x = __instance.curStats.scale;
             __instance.currentScale.y = __instance.curStats.scale;
             __instance.currentScale.z = __instance.curStats.scale;
             return false;
+        }
+
+        private static void limitStats(BaseStats curStats)
+        {
+            curStats.armor = Mathf.Clamp(curStats.armor, 0, int.Parse(Main.savedStats.inputOptions["ArmorLimit"]));
+            curStats.speed = Mathf.Clamp(curStats.speed, 0, int.Parse(Main.savedStats.inputOptions["SpeedLimit"]));
+            curStats.damage = Mathf.Clamp(curStats.damage, 0, int.Parse(Main.savedStats.inputOptions["DMGLimit"]));
+            curStats.health = Mathf.Clamp(curStats.health, 0, int.Parse(Main.savedStats.inputOptions["HealthLimit"]));
         }
 
         public static void updateAge_Postfix(Actor __instance)

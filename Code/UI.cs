@@ -115,6 +115,19 @@ namespace CommissionMod
 
         private static void addButtons()
         {
+            PowerButton limitButton = NCMS.Utils.PowerButtons.CreateButton(
+                "statLimitsButton",
+                NCMS.Utils.Sprites.LoadSprite($"{Mod.Info.Path}/icon.png"),
+                "Stat Limiter",
+                "Click Here To Limit Stats",
+                new Vector2(0, 0),
+                ButtonType.Click,
+                null,
+                () => Windows.ShowWindow("statLimitWindow")
+            );
+
+            NCMS.Utils.PowerButtons.AddButtonToTab(limitButton, NCMS.Utils.PowerTab.Main, new Vector2(674, 18));
+
             PowerButton settingsButton = NCMS.Utils.PowerButtons.CreateButton(
                 "commissionModSettingsButton",
                 NCMS.Utils.Sprites.LoadSprite($"{Mod.Info.Path}/icon.png"),
