@@ -35,29 +35,39 @@ namespace CommissionMod
             {"Erank", 2},
             {"Frank", 1},
         };
-        public static List<ToggleIcon> toggles = new List<ToggleIcon>();
+        public static Dictionary<ToggleIcon, string> toggles = new Dictionary<ToggleIcon, string>();
         public static Dictionary<string, bool> filterToggles = new Dictionary<string, bool>();
 
         public static void init()
         {
             addLeaderBoardWindow("leaderBoardWindow", "Talent Leader Board");
-            Button levelButton = createBGButton(scrollView, "levels", 50, "Levels", "LevelsFilter", "Search Units By Level");
+            Button levelButton = createBGButton(scrollView, "levels", 80, "Levels", "LevelsFilter", "Search Units By Level");
             levelButton.onClick.AddListener(() => searchUnits("levels", getUnitList()));
-            Button talentButton = createBGButton(scrollView, "talents", 20, "Talents", "TalentsFilter", "Search Units By Talent");
+            Button talentButton = createBGButton(scrollView, "talents", 50, "Talents", "TalentsFilter", "Search Units By Talent");
             talentButton.onClick.AddListener(() => searchUnits("talents", getUnitList()));
-            Button killsButton = createBGButton(scrollView, "kills", -10, "Kills", "KillsFilter", "Search Units By Kills");
+            Button killsButton = createBGButton(scrollView, "kills", 20, "Kills", "KillsFilter", "Search Units By Kills");
             killsButton.onClick.AddListener(() => searchUnits("kills", getUnitList()));
-            Button filterButton = createBGButton(scrollView, "kingdomFilter", -40, "Talents", "KingdomFilter", "Search Units By Filter");
-            filterButton.onClick.AddListener(FilterWindow.openKingdomWindow);
+            Button ageButton = createBGButton(scrollView, "age", -10, "Age", "AgeFilter", "Search Units By Age");
+            ageButton.onClick.AddListener(() => searchUnits("age", getUnitList()));
+            Button dmgButton = createBGButton(scrollView, "dmg", -40, "DMG", "DMGFilter", "Search Units By Damage");
+            dmgButton.onClick.AddListener(() => searchUnits("dmg", getUnitList()));
+            Button kingdomFilterButton = createBGButton(scrollView, "kingdomFilter", -70, "GoldCrown", "KingdomFilter", "Search Units By Kingdom Filter");
+            kingdomFilterButton.onClick.AddListener(FilterWindow.openKingdomWindow);
+            Button cityFilterButton = createBGButton(scrollView, "cityFilter", -100, "SilverCrown", "CityFilter", "Search Units By City Filter");
+            cityFilterButton.onClick.AddListener(FilterWindow.openCityWindow);
         }
 
         private static List<Actor> getUnitList()
         {
-            if (FilterWindow.kingdomFilter == null)
+            if (FilterWindow.kingdomFilter != null)
             {
-                return MapBox.instance.units.getSimpleList();
+                return FilterWindow.kingdomFilter.units.getSimpleList();
             }
-            return FilterWindow.kingdomFilter.units.getSimpleList();
+            else if (FilterWindow.cityFilter != null)
+            {
+                return FilterWindow.cityFilter.units.getSimpleList();
+            }
+            return MapBox.instance.units.getSimpleList();
         }
 
         public static void openWindow()
@@ -119,6 +129,12 @@ namespace CommissionMod
                             break;
                         case "nothing":
                             num2 = 0;
+                            break;
+                        case "age":
+                            num2 = actor2.data.age;
+                            break;
+                        case "dmg":
+                            num2 = actor2.curStats.damage;
                             break;
                         default:
                             return unitList;
@@ -191,6 +207,12 @@ namespace CommissionMod
                     break;
                 case "kills":
                     GameObject killsText = UI.addText($"{actor.data.kills}", bgElement, 50, new Vector3(140, 5, 0)).gameObject;
+                    break;
+                case "age":
+                    GameObject ageText = UI.addText($"{actor.data.age}", bgElement, 50, new Vector3(140, 5, 0)).gameObject;
+                    break;
+                case "dmg":
+                    GameObject dmgText = UI.addText($"{actor.curStats.damage}", bgElement, 50, new Vector3(140, 5, 0)).gameObject;
                     break;
                 default:
                     string[] actortalent = hasTalent(actor.data).Split('r');
@@ -285,7 +307,7 @@ namespace CommissionMod
             toggleRect.localPosition = new Vector3(0, 12, 0);
             toggleRect.sizeDelta = new Vector2(8, 7);
 
-            toggles.Add(toggleIcon);
+            toggles.Add(toggleIcon, name);
             filterToggles.Add(name, false);
             buttonButton.onClick.AddListener(() => checkToggledIcon(toggleIcon, name));
 
@@ -294,17 +316,39 @@ namespace CommissionMod
 
         public static void checkToggledIcon(ToggleIcon toggleIcon, string name)
         {
-            foreach(ToggleIcon toggle in toggles)
-            {
-                toggle.updateIcon(false);
-            }
-            toggleIcon.updateIcon(true);
             for(int i = 0; i < filterToggles.Count; i++)
             {
                 KeyValuePair<string, bool> kv = filterToggles.ElementAt(i);
                 filterToggles[kv.Key] = false;
             }
+            if (name == "kingdomFilter" || name == "cityFilter")
+            {
+                return;
+            }
             filterToggles[name] = true;
+            updateToggledIcons();
+            toggleIcon.updateIcon(true);
+        }
+
+        public static void updateToggledIcons()
+        {
+            List<string> trueFilters = new List<string>();
+            foreach(KeyValuePair<string, bool> kv in filterToggles)
+            {
+                if (filterToggles[kv.Key])
+                {
+                    trueFilters.Add(kv.Key);
+                }
+            }
+            foreach(KeyValuePair<ToggleIcon, string> kv in toggles)
+            {
+                if ((kv.Value == "kingdomFilter" && FilterWindow.kingdomFilter != null) || (kv.Value == "cityFilter" && FilterWindow.cityFilter != null) || trueFilters.Contains(kv.Value))
+                {
+                    kv.Key.updateIcon(true);
+                    continue;
+                }
+                kv.Key.updateIcon(false);
+            }
         }
     }
 }

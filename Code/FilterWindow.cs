@@ -35,6 +35,10 @@ namespace CommissionMod
             {
                 Destroy(child.gameObject);
             }
+            if (MapBox.instance.kingdoms.list_civs.Count > 16)
+            {
+                filterContents.GetComponent<RectTransform>().sizeDelta += new Vector2(0, (MapBox.instance.kingdoms.list_civs.Count/4)*50);
+            }
             toggles.Clear();
             int posY = 0;
             int posX = 0;
@@ -48,7 +52,7 @@ namespace CommissionMod
                     posX = 0;
                 }
                 // Adds PowerButtons To Window
-                createFilterButton(filterContents, "kingdom", new Vector2(50+(posX*50),-50+(-posY*40)), "Levels", kingdom.name, "Click on this kingdom as a filter", kingdom);
+                createFilterButton(filterContents, "kingdom", new Vector2(50+(posX*50),-50+(-posY*40)), kingdom.name, "Click on this kingdom as a filter", kingdom, null);
                 posX++;
             }
             if (posX >= 4)
@@ -56,7 +60,7 @@ namespace CommissionMod
                 posY++;
                 posX = 0;
             }
-            createNoFilterButton(filterContents, "kingdom", new Vector2(50+(posX*50),-50+(-posY*40)), "No Filter", "Click on this kingdom as a filter");
+            createNoFilterButton(filterContents, new Vector2(50+(posX*50),-50+(-posY*40)), "No Filter", "Click on this kingdom as a filter");
             // Open Window
             Windows.ShowWindow("filterWindow");
         }
@@ -68,20 +72,24 @@ namespace CommissionMod
             {
                 Destroy(child.gameObject);
             }
+            if (MapBox.instance.citiesList.Count > 16)
+            {
+                filterContents.GetComponent<RectTransform>().sizeDelta += new Vector2(0, (MapBox.instance.citiesList.Count/4)*50);
+            }
             toggles.Clear();
             int posY = 0;
             int posX = 0;
             // Loop Through Kingdoms List To Make Buttons
-            for (int l = 0; l < MapBox.instance.kingdoms.list_civs.Count; l++)
+            for (int l = 0; l < MapBox.instance.citiesList.Count; l++)
             {
-                Kingdom kingdom = MapBox.instance.kingdoms.list_civs[l];
+                City city = MapBox.instance.citiesList[l];
                 if (posX >= 4)
                 {
                     posY++;
                     posX = 0;
                 }
                 // Adds PowerButtons To Window
-                createFilterButton(filterContents, "city", new Vector2(50+(posX*50),-50+(-posY*40)), "Levels", kingdom.name, "Click on this kingdom as a filter", kingdom);
+                createFilterButton(filterContents, "city", new Vector2(50+(posX*50),-50+(-posY*40)), city.data.cityName, "Click on this city as a filter", city.kingdom, city);
                 posX++;
             }
             if (posX >= 4)
@@ -89,12 +97,12 @@ namespace CommissionMod
                 posY++;
                 posX = 0;
             }
-            createNoFilterButton(filterContents, "city", new Vector2(50+(posX*50),-50+(-posY*40)), "No Filter", "Click on this kingdom as a filter");
+            createNoFilterButton(filterContents, new Vector2(50+(posX*50),-50+(-posY*40)), "No Filter", "Click on this kingdom as a filter");
             // Open Window
             Windows.ShowWindow("filterWindow");
         }
 
-        private static Button createFilterButton(GameObject parent, string name, Vector2 pos, string iconName, string buttonName, string buttonDesc, Kingdom kingdom)
+        private static Button createFilterButton(GameObject parent, string name, Vector2 pos, string buttonName, string buttonDesc, Kingdom kingdom, City city)
         {
             // Check if the localization for button has already been added then remove it
             if (LocalizedTextManager.instance.localizedText.ContainsKey($"{buttonName}_dej_button"))
@@ -150,12 +158,20 @@ namespace CommissionMod
 
             // Add listeners
             toggles.Add(toggleIcon);
-            buttonButton.onClick.AddListener(() => checkKingdomToggledIcon(toggleIcon, name, kingdom));
+            switch(name)
+            {
+                case "kingdom":
+                    buttonButton.onClick.AddListener(() => checkKingdomToggledIcon(toggleIcon, kingdom));
+                    break;
+                case "city":
+                    buttonButton.onClick.AddListener(() => checkCityToggledIcon(toggleIcon, city));
+                    break;
+            }
 
             return buttonButton;
         }
 
-        private static void checkKingdomToggledIcon(ToggleIcon toggleIcon, string name, Kingdom kingdom)
+        private static void checkKingdomToggledIcon(ToggleIcon toggleIcon, Kingdom kingdom)
         {
             if (kingdomFilter == kingdom)
             {
@@ -171,19 +187,12 @@ namespace CommissionMod
             toggleIcon.updateIcon(true);
             kingdomFilter = kingdom;
             cityFilter = null;
-            // string sortName = "nothing";
-            // for(int i = 0; i < LeaderBoard.filterToggles.Count; i++)
-            // {
-            //     KeyValuePair<string, bool> kv = LeaderBoard.filterToggles.ElementAt(i);
-            //     if (LeaderBoard.filterToggles[kv.Key])
-            //     {
-            //         sortName = kv.Key;
-            //     }
-            // }
-            // LeaderBoard.searchUnits(sortName, kingdom.units.getSimpleList());
+            string sortName = getSortName();
+            LeaderBoard.updateToggledIcons();
+            LeaderBoard.searchUnits(sortName, kingdom.units.getSimpleList());
         }
 
-        private static Button createNoFilterButton(GameObject parent, string name, Vector2 pos, string buttonName, string buttonDesc)
+        private static Button createNoFilterButton(GameObject parent, Vector2 pos, string buttonName, string buttonDesc)
         {
             // Check if the localization for button has already been added then remove it
             if (LocalizedTextManager.instance.localizedText.ContainsKey($"{buttonName}_dej_button"))
@@ -239,9 +248,12 @@ namespace CommissionMod
             toggleIcon.updateIcon(true);
             kingdomFilter = null;
             cityFilter = null;
+            string sortName = getSortName();
+            LeaderBoard.updateToggledIcons();
+            LeaderBoard.searchUnits(sortName, MapBox.instance.units.getSimpleList());
         }
 
-        private static void checkCityToggledIcon(ToggleIcon toggleIcon, string name, City city)
+        private static void checkCityToggledIcon(ToggleIcon toggleIcon, City city)
         {
             if (cityFilter == city)
             {
@@ -257,6 +269,23 @@ namespace CommissionMod
             toggleIcon.updateIcon(true);
             cityFilter = city;
             kingdomFilter = null;
+            string sortName = getSortName();
+            LeaderBoard.updateToggledIcons();
+            LeaderBoard.searchUnits(sortName, city.units.getSimpleList());
+        }
+
+        private static string getSortName()
+        {
+            string sortName = "nothing";
+            for(int i = 0; i < LeaderBoard.filterToggles.Count; i++)
+            {
+                KeyValuePair<string, bool> kv = LeaderBoard.filterToggles.ElementAt(i);
+                if (LeaderBoard.filterToggles[kv.Key])
+                {
+                    sortName = kv.Key;
+                }
+            }
+            return sortName;
         }
 
         private static void addFilterWindow(string id, string title)

@@ -69,9 +69,9 @@ namespace CommissionMod
 
             createStatOption(
                 "Stat Boost Per Level Leap",
-                new List<string>{"Damage", "Critical", "Attack Speed", "Health"},
+                new List<string>{"Damage", "Armor", "Critical", "Attack Speed", "Health"},
                 -320,
-                new List<string>{"75", "5", "5", "600"}
+                new List<string>{"75", "0", "5", "5", "600"}
             );
 
             createStatOption(
@@ -299,7 +299,14 @@ namespace CommissionMod
                 Text inputChildText = inputChild.GetComponent<Text>();
                 inputChildText.resizeTextMaxSize = 20;
                 InputField inputFieldComp = inputChild.GetComponent<InputField>();
-                inputFieldComp.characterValidation = InputField.CharacterValidation.Decimal;
+                if (!int.TryParse(textValues[index], out _))
+                {
+                    inputFieldComp.characterValidation = InputField.CharacterValidation.Decimal;
+                }
+                else
+                {
+                    inputFieldComp.characterValidation = InputField.CharacterValidation.Integer;
+                }
                 nameInputComp.inputField.onValueChanged.AddListener(delegate{
                     changeInput(stat, inputFieldComp);
                 });
@@ -356,7 +363,14 @@ namespace CommissionMod
                 Text inputChildText = inputChild.GetComponent<Text>();
                 inputChildText.resizeTextMaxSize = 20;
                 InputField inputFieldComp = inputChild.GetComponent<InputField>();
-                inputFieldComp.characterValidation = InputField.CharacterValidation.Decimal;
+                if (!isInt)
+                {
+                    inputFieldComp.characterValidation = InputField.CharacterValidation.Decimal;
+                }
+                else
+                {
+                    inputFieldComp.characterValidation = InputField.CharacterValidation.Integer;
+                }
                 nameInputComp.inputField.onValueChanged.AddListener(delegate{
                     changeTraitInput(objName, field, inputFieldComp, isInt);
                 });

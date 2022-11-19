@@ -243,7 +243,7 @@ namespace CommissionMod
             __instance._status_frozen = __instance.haveStatus("frozen");
             int statIncrease = (int)(__instance.data.level/10);
             __instance.curStats.damage += ((__instance.data.level - 1) / 2) + (statIncrease*int.Parse(Main.savedStats.inputOptions["Damage"]));
-            __instance.curStats.armor += (__instance.data.level - 1) / 3;
+            __instance.curStats.armor += /*(__instance.data.level - 1) / 3*/ (statIncrease*int.Parse(Main.savedStats.inputOptions["Armor"]));
             __instance.curStats.crit += (float)((__instance.data.level - 1) + (statIncrease*int.Parse(Main.savedStats.inputOptions["Critical"])));
             __instance.curStats.attackSpeed += (float)((__instance.data.level - 1) + (statIncrease*int.Parse(Main.savedStats.inputOptions["Attack Speed"])));
             __instance.curStats.health += ((__instance.data.level - 1) * 20) + (statIncrease*int.Parse(Main.savedStats.inputOptions["Health"]));
