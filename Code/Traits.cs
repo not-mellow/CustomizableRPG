@@ -34,7 +34,9 @@ namespace CommissionMod
                 newStats,
                 100,
                 0.05f,
-                250
+                250,
+                10,
+                5
             );
             createTalentTrait(
                 "Erank",
@@ -45,7 +47,9 @@ namespace CommissionMod
                 newStats,
                 70,
                 0.08f,
-                300
+                300,
+                20,
+                10
             );
             createTalentTrait(
                 "Drank",
@@ -56,7 +60,9 @@ namespace CommissionMod
                 newStats,
                 75,
                 0.10f,
-                320
+                320,
+                30,
+                15
             );
             createTalentTrait(
                 "Crank",
@@ -67,7 +73,9 @@ namespace CommissionMod
                 newStats,
                 77,
                 0.15f,
-                350
+                350,
+                40,
+                20
             );
 
             createTalentTrait(
@@ -79,7 +87,9 @@ namespace CommissionMod
                 newStats,
                 80,
                 0.2f,
-                370
+                370,
+                50,
+                25
             );
             createTalentTrait(
                 "Arank",
@@ -90,7 +100,9 @@ namespace CommissionMod
                 newStats,
                 90,
                 0.30f,
-                400
+                400,
+                60,
+                30
             );
             createTalentTrait(
                 "Srank",
@@ -101,7 +113,9 @@ namespace CommissionMod
                 newStats,
                 110,
                 0.3f,
-                450
+                450,
+                70,
+                50
             );
             createTalentTrait(
                 "SSrank",
@@ -112,7 +126,9 @@ namespace CommissionMod
                 newStats,
                 130,
                 0.35f,
-                480
+                480,
+                80,
+                55
             );
             createTalentTrait(
                 "SSSrank",
@@ -123,7 +139,9 @@ namespace CommissionMod
                 newStats,
                 150,
                 0.4f,
-                510
+                510,
+                90,
+                60
             );
             createTalentTrait(
                 "EXrank",
@@ -134,7 +152,9 @@ namespace CommissionMod
                 newStats,
                 200,
                 0.5f,
-                550
+                550,
+                100,
+                70
             );
             createTalentTrait(
                 "Sigma",
@@ -145,6 +165,8 @@ namespace CommissionMod
                 newStats,
                 1,
                 0f,
+                1,
+                10,
                 1
             );
             createTalentTrait(
@@ -156,6 +178,8 @@ namespace CommissionMod
                 newStats,
                 1,
                 0f,
+                1,
+                10,
                 1
             );
             createTalentTrait(
@@ -167,13 +191,16 @@ namespace CommissionMod
                 newStats,
                 1,
                 0f,
+                1,
+                10,
                 1
             );
 
             addTalentList();
         }
 
-        private static void createTalentTrait(string newID, string icon, string title, string desc, float newBirth, BaseStats newStats, int expGainMod, float percentageMod, int passive)
+        private static void createTalentTrait(string newID, string icon, string title, string desc, float newBirth, 
+        BaseStats newStats, int expGainKillMod, float percentageMod, int passive, int levelCap, int expGainHitMod)
         {
             Localization.AddOrSet($"trait_{newID}", title);
             Localization.AddOrSet($"trait_{newID}_info", desc);
@@ -198,14 +225,39 @@ namespace CommissionMod
             }
             addedTalents.Add(talent);
             SavedTrait newTrait = new SavedTrait{
-                expGain = expGainMod,
+                expGainKill = expGainKillMod,
+                expGainHit = expGainHitMod,
                 spawnRate = newBirth,
                 decreaseEXPRequirement = percentageMod,
-                passiveExpGain = passive
+                passiveExpGain = passive,
+                talentLevelCap = levelCap
             };
-            if (Main.hasSettings)
+            if (Main.hasSettings && Main.savedStats.traits.ContainsKey(talent.id))
             {
-                newTrait = Main.savedStats.traits[talent.id];
+                SavedTrait currentSavedTrait = Main.savedStats.traits[talent.id];
+                bool useSavedTrait = true;
+                foreach (FieldInfo field in currentSavedTrait.GetType().GetFields())
+                {
+                    int ivalue = 0;
+                    float fvalue = 0f;
+                    if (field.FieldType != typeof(int))
+                    {
+                        fvalue = (float)(field.GetValue(currentSavedTrait));
+                    }
+                    else
+                    {
+                        ivalue = (int)(field.GetValue(currentSavedTrait));
+                    }
+                    if (ivalue < 0 || fvalue < 0)
+                    {
+                        useSavedTrait = false;
+                        break;
+                    }
+                }
+                if (useSavedTrait)
+                {
+                    newTrait = currentSavedTrait;
+                }
             }
             talentIDs.Add(talent.id, newTrait);
         }
@@ -230,9 +282,11 @@ namespace CommissionMod
 
     public class SavedTrait
     {
-        public int expGain = 0;
-        public float spawnRate = 0f;
-        public float decreaseEXPRequirement = 0f;
-        public int passiveExpGain = 0;
+        public int expGainKill = -1;
+        public int expGainHit = -1;
+        public float spawnRate = -1f;
+        public float decreaseEXPRequirement = -1f;
+        public int passiveExpGain = -1;
+        public int talentLevelCap = -1;
     }
 }

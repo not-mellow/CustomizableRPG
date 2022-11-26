@@ -12,3 +12,14 @@ This will vary between ranks.
 6. Whoever kills the Boss can gain some bonuses (all customizable too) like speed/damage etc.
 7. I imagine you may even make it be randomized which stat it boosts and how much.
 8. Maybe like every 1k years, random boss creature ' rhino, buffalo, hyena ' and killing it can give say damage or speed by 10 or something.
+
+Adiniz Suggestions
+1. Make hits and kills exp gain customizable (DONE)
+
+Archeron Suggestions
+1. Kingdom and village filters for both level and talent stats windows (IN PROGRESS)
+2. Customizable level cap per talent (DONE)
+
+Poh Suggestions
+1. Ability to follow favorited weapons
+2. Crafting

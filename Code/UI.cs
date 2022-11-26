@@ -27,7 +27,7 @@ namespace CommissionMod
             addSettingsWindow("commissionSettings", "Settings Window");
             addButtons();
             RectTransform settingRect = settingContents.GetComponent<RectTransform>();
-            settingRect.sizeDelta += new Vector2(0, Traits.talentIDs.Count*140);
+            settingRect.sizeDelta += new Vector2(0, Traits.talentIDs.Count*220);
 
             // GameObject mainTab = GameObjects.FindEvenInactive("Tab_Main");
             GameObject levelRateHolder = createInputOption(
@@ -70,14 +70,14 @@ namespace CommissionMod
             createStatOption(
                 "Stat Boost Per Level Leap",
                 new List<string>{"Damage", "Armor", "Critical", "Attack Speed", "Health"},
-                -320,
+                -340,
                 new List<string>{"75", "0", "5", "5", "600"}
             );
 
             createStatOption(
                 "DMG Reduct Per LVL Leap",
                 new List<string>{"InitialLevel", "DMGReductionPercent"},
-                -420,
+                -460,
                 new List<string>{"10", "0.5"}
             );
 
@@ -85,7 +85,7 @@ namespace CommissionMod
                 "getHitOption",
                 "Exp Gained From Getting Hit",
                 "Modify How Much Exp A Unit Gets When Hit By Someone.",
-                -500,
+                -540,
                 settingContents,
                 "1"
             );
@@ -96,7 +96,7 @@ namespace CommissionMod
                 createTraitOption(
                     kv.Key,
                     kv.Value,
-                    -590 + (-index*100)
+                    -630 + (-index*160)
                 );
                 index++;
             }
@@ -106,7 +106,7 @@ namespace CommissionMod
                 Mod.EmbededResources.LoadSprite($"{Mod.Info.Name}.Resources.UI.save_icon.png"),
                 "Save Changes",
                 "Save The Changes To The Settings",
-                new Vector2(130, -1860),
+                new Vector2(130, -2650),
                 ButtonType.Click,
                 settingContents.transform,
                 Main.saveStats
@@ -273,7 +273,7 @@ namespace CommissionMod
             statImage.sprite = Mod.EmbededResources.LoadSprite($"{Mod.Info.Name}.Resources.UI.windowInnerSliced.png");
             RectTransform statHolderRect = statHolder.GetComponent<RectTransform>();
             statHolderRect.localPosition = new Vector3(130, posY, 0);
-            statHolderRect.sizeDelta = new Vector2(600, 150 + (statNames.Count*40));
+            statHolderRect.sizeDelta = new Vector2(600, 150 + (statNames.Count*50));
 
             Text nameText = addText(objName, statHolder, 30, new Vector3(0, 105, 0));
             RectTransform nameTextRect = nameText.gameObject.GetComponent<RectTransform>();
@@ -337,9 +337,9 @@ namespace CommissionMod
             statImage.sprite = Mod.EmbededResources.LoadSprite($"{Mod.Info.Name}.Resources.UI.windowInnerSliced.png");
             RectTransform statHolderRect = statHolder.GetComponent<RectTransform>();
             statHolderRect.localPosition = new Vector3(130, posY, 0);
-            statHolderRect.sizeDelta = new Vector2(600, 280);
+            statHolderRect.sizeDelta = new Vector2(600, 400);
 
-            Text nameText = addText(objName, statHolder, 30, new Vector3(0, 105, 0));
+            Text nameText = addText(objName, statHolder, 30, new Vector3(0, 145, 0));
             RectTransform nameTextRect = nameText.gameObject.GetComponent<RectTransform>();
             nameTextRect.sizeDelta = new Vector2(0, 50);
 
@@ -348,7 +348,7 @@ namespace CommissionMod
             foreach (FieldInfo field in trait.GetType().GetFields())
             {
 
-                Text fieldNameText = addText(field.Name, statHolder, 15, new Vector3(-140, 45 + (-50*index), 0));
+                Text fieldNameText = addText(field.Name, statHolder, 15, new Vector3(-140, 100 + (-55*index), 0));
                 fieldNameText.alignment = TextAnchor.MiddleLeft;
                 RectTransform fieldNameRect = fieldNameText.gameObject.GetComponent<RectTransform>();
                 fieldNameRect.sizeDelta = new Vector2(0, 50);
@@ -361,13 +361,14 @@ namespace CommissionMod
                     isInt = false;
                 }
                 textValue = (string)(field.GetValue(trait).ToString());
+                // Debug.Log($"{field.Name}: {textValue}");
                 // if (Main.hasSettings)
                 // {
                 //     textValue = Main.savedStats.inputOptions[objName];
                 // }
                 nameInputComp.setText(textValue);
                 RectTransform inputRect = inputField.GetComponent<RectTransform>();
-                inputRect.localPosition = new Vector3(0, 45 + (-50*index),0);
+                inputRect.localPosition = new Vector3(0, 105 + (-54*index),0);
                 inputRect.sizeDelta += new Vector2(120, 40);
 
                 GameObject inputChild = inputField.transform.Find("InputField").gameObject;

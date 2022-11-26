@@ -41,6 +41,10 @@ namespace CommissionMod
             postfix: new HarmonyMethod(AccessTools.Method(typeof(Patches), "OnEnable_Postfix")));
             harmony.Patch(AccessTools.Method(typeof(ActorBase), "addTrait"), 
             prefix: new HarmonyMethod(AccessTools.Method(typeof(Patches), "addTrait_Prefix")));
+            harmony.Patch(AccessTools.Method(typeof(MapBox), "applyAttack"), 
+            prefix: new HarmonyMethod(AccessTools.Method(typeof(Patches), "applyAttack_Prefix")));
+            harmony.Patch(AccessTools.Method(typeof(Actor), "newKillAction"), 
+            prefix: new HarmonyMethod(AccessTools.Method(typeof(Patches), "newKillAction_Prefix")));
         }
 
         public static bool getExpToLevelup_Prefix(Actor __instance, ref int __result)
@@ -53,7 +57,7 @@ namespace CommissionMod
                 initialexp = 100;
             }
             int normalexp = initialexp + (__instance.data.level) * expGap;
-            foreach (KeyValuePair<string, SavedTrait> kv in Traits.talentIDs)
+            foreach (KeyValuePair<string, SavedTrait> kv in Main.savedStats.traits)
             {
                 if (__instance.haveTrait(kv.Key))
                 {
@@ -72,7 +76,12 @@ namespace CommissionMod
                 return false;
             }
             int capValue = int.Parse(UI.getOption("levelCapOption"));
+            string talentID = hasTalent(__instance.data);
             if (capValue > -1 && __instance.data.level >= capValue)
+            {
+                return false;
+            }
+            else if (talentID != null && __instance.data.level >= Main.savedStats.traits[talentID].talentLevelCap)
             {
                 return false;
             }
@@ -81,19 +90,18 @@ namespace CommissionMod
             // {
             //     num += culture.getMaxLevelBonus();
             // }
-            int expGain = 0;
-            string talentID = hasTalent(__instance.data);
-            if (talentID != null)
-            {
-                expGain = Traits.talentIDs[talentID].expGain;
-            }
-            if (pValue < 0)
-            {
-                expGain = 0;
-                pValue = Math.Abs(pValue);
-            }
+            // int expGain = 0;
+            // if (talentID != null)
+            // {
+            //     expGain = Traits.talentIDs[talentID].expGain;
+            // }
+            // if (pValue < 0)
+            // {
+            //     expGain = 0;
+            //     pValue = Math.Abs(pValue);
+            // }
             int expToLevelup = __instance.getExpToLevelup();
-            __instance.data.experience += pValue + expGain;
+            __instance.data.experience += pValue /*+ expGain*/;
             if (__instance.data.experience >= expToLevelup)
             {
                 __instance.data.experience = 0;
@@ -402,13 +410,8 @@ namespace CommissionMod
                 {
                     __instance.restoreHealth((int)(__instance.curStats.health*0.1f));
                 }
-                foreach (KeyValuePair<string, SavedTrait> kv in Traits.talentIDs)
-                {
-                    if (__instance.haveTrait(kv.Key))
-                    {
-                        __instance.addExperience((int)(kv.Value.passiveExpGain*-1));
-                    }
-                }
+                string talentID = hasTalent(__instance.data);
+                __instance.addExperience((int)(Main.savedStats.traits[talentID].passiveExpGain));
             }
         }
 
@@ -451,7 +454,7 @@ namespace CommissionMod
                 {
                     __instance.addTrait("eyepatch", false);
                 }
-                __instance.addExperience(int.Parse(UI.getOption("getHitOption"))*-1);
+                __instance.addExperience(int.Parse(UI.getOption("getHitOption")));
             }
             if (pFlash)
             {
@@ -609,6 +612,101 @@ namespace CommissionMod
             __instance.data.traits.Add(pTrait);
             __instance.setStatsDirty();
             return true;
+        }
+
+        public static bool applyAttack_Prefix(BaseSimObject pAttacker, BaseSimObject pTarget, Vector3 pAttackPos, WorldTile pTile, bool pCritical = false)
+        {
+            int num = pAttacker.curStats.damage;
+            if (pCritical)
+            {
+                num = (int)((float)pAttacker.curStats.damage * pAttacker.curStats.damageCritMod);
+            }
+            pTarget.getHit((float)num, true, AttackType.Other, pAttacker, true);
+            if (pAttacker.isActor())
+            {
+                string talentID = hasTalent(pAttacker.a.data);
+                if (talentID != null)
+                {
+                    pAttacker.a.addExperience(Traits.talentIDs[talentID].expGainHit);
+                }
+                else
+                {
+                    pAttacker.a.addExperience(2);
+                }
+                ItemAsset weaponAsset = pAttacker.a.getWeaponAsset();
+                if (weaponAsset.attackAction != null)
+                {
+                    weaponAsset.attackAction(pTarget, pTile);
+                }
+            }
+            if (pTarget.isActor() && pAttacker.isActor())
+            {
+                foreach (string pID in pAttacker.a.data.s_traits_ids)
+                {
+                    ActorTrait actorTrait = AssetManager.traits.get(pID);
+                    if (actorTrait.action_attack_target != null)
+                    {
+                        actorTrait.action_attack_target(pTarget, pTarget.currentTile);
+                    }
+                }
+            }
+            if (pTarget.isActor() && pAttacker.isActor() && !pTarget.base_data.alive && pAttacker.a.stats.animal && pAttacker.a.stats.diet_meat && pTarget.a.stats.source_meat)
+            {
+                pAttacker.a.restoreStatsFromEating(70, 0f, true);
+            }
+            float num2;
+            if (pTarget.base_data.health > 0)
+            {
+                num2 = 0.2f * pAttacker.curStats.knockback;
+            }
+            else
+            {
+                num2 = 0.3f * pAttacker.curStats.knockback;
+            }
+            num2 -= num2 * (pTarget.curStats.knockbackReduction / 100f);
+            if (num2 < 0f)
+            {
+                num2 = 0f;
+            }
+            if (num2 > 0f && pTarget.isActor())
+            {
+                float angle = Toolbox.getAngle(pTarget.transform.position.x, pTarget.transform.position.y, pAttackPos.x, pAttackPos.y);
+                pTarget.a.addForce(-Mathf.Cos(angle) * num2, -Mathf.Sin(angle) * num2, num2);
+            }
+            return false;
+        }
+
+        public static bool newKillAction_Prefix(Actor pDeadUnit, Actor __instance)
+        {
+            __instance.data.kills++;
+            if (__instance.equipment != null && !__instance.equipment.weapon.isEmpty())
+            {
+                __instance.equipment.weapon.data.kills++;
+            }
+            if (__instance.data.kills > 10)
+            {
+                __instance.addTrait("veteran", false);
+            }
+            string talentID = hasTalent(__instance.data);
+            __instance.addExperience(Main.savedStats.traits[talentID].expGainKill);
+            if (__instance.haveTrait("madness"))
+            {
+                __instance.restoreHealth(__instance.curStats.health / 15 + 1);
+            }
+            if (__instance.stats.use_items && !pDeadUnit.haveTrait("infected") && __instance.stats.take_items)
+            {
+                __instance.takeItems(pDeadUnit, __instance.stats.take_items_ignore_range_weapons);
+            }
+            if (pDeadUnit.stats.flag_dragon)
+            {
+                __instance.addTrait("dragonslayer", false);
+                return false;
+            }
+            if (pDeadUnit.stats.flag_mage)
+            {
+                __instance.addTrait("mageslayer", false);
+            }
+            return false;
         }
     }
 }
