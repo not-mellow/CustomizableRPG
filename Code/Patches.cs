@@ -45,6 +45,10 @@ namespace CommissionMod
             prefix: new HarmonyMethod(AccessTools.Method(typeof(Patches), "applyAttack_Prefix")));
             harmony.Patch(AccessTools.Method(typeof(Actor), "newKillAction"), 
             prefix: new HarmonyMethod(AccessTools.Method(typeof(Patches), "newKillAction_Prefix")));
+            harmony.Patch(AccessTools.Method(typeof(WorldBehaviourActions), "updateUnitSpawn"), 
+            prefix: new HarmonyMethod(AccessTools.Method(typeof(Patches), "updateUnitSpawn_Prefix")));
+            harmony.Patch(AccessTools.Method(typeof(MapBox), "spawnNewUnit"), 
+            prefix: new HarmonyMethod(AccessTools.Method(typeof(Patches), "spawnNewUnit_Prefix")));
         }
 
         public static bool getExpToLevelup_Prefix(Actor __instance, ref int __result)
@@ -126,9 +130,9 @@ namespace CommissionMod
 
         private static string hasTalent(ActorStatus status)
         {
-            foreach(KeyValuePair<string, SavedTrait> kv in Traits.talentIDs)
+            foreach(KeyValuePair<string, SavedTrait> kv in Main.savedStats.traits)
             {
-                if (status.haveTrait(kv.Key))
+                if (status.haveTrait(kv.Key) || status.traits.Contains(kv.Key))
                 {
                     return kv.Key;
                 }
@@ -143,6 +147,10 @@ namespace CommissionMod
             for (int i = 0; i < Traits.talentIDs.Count; i++)
             {
                 string traitID = reversedTalentIDS.ElementAt(i).Key;
+                if (Main.savedStats.traits[traitID].type != RankType.Human)
+                {
+                    continue;
+                }
                 ActorTrait actorTrait = AssetManager.traits.get(traitID);
                 if (actorTrait.birth != 0f)
                 {
@@ -250,11 +258,21 @@ namespace CommissionMod
             __instance._trait_weightless = __instance.haveTrait("weightless");
             __instance._status_frozen = __instance.haveStatus("frozen");
             int statIncrease = (int)(__instance.data.level/10);
-            __instance.curStats.damage += ((__instance.data.level - 1) / 2) + (statIncrease*int.Parse(Main.savedStats.inputOptions["Damage"]));
-            __instance.curStats.armor += /*(__instance.data.level - 1) / 3*/ (statIncrease*int.Parse(Main.savedStats.inputOptions["Armor"]));
-            __instance.curStats.crit += (float)((__instance.data.level - 1) + (statIncrease*int.Parse(Main.savedStats.inputOptions["Critical"])));
-            __instance.curStats.attackSpeed += (float)((__instance.data.level - 1) + (statIncrease*int.Parse(Main.savedStats.inputOptions["Attack Speed"])));
-            __instance.curStats.health += ((__instance.data.level - 1) * 20) + (statIncrease*int.Parse(Main.savedStats.inputOptions["Health"]));
+            float multi = 1;
+            if (float.Parse(Main.savedStats.inputOptions["Multiplier"]) > 0)
+            {
+                multi = (statIncrease*float.Parse(Main.savedStats.inputOptions["Multiplier"]));
+            }
+            __instance.curStats.damage += ((__instance.data.level - 1) / 2) + 
+            (int)((statIncrease*int.Parse(Main.savedStats.inputOptions["Damage"])) * multi);
+            __instance.curStats.armor += /*(__instance.data.level - 1) / 3*/ 
+            (int)((statIncrease*int.Parse(Main.savedStats.inputOptions["Armor"])) * multi);
+            __instance.curStats.crit += (float)(__instance.data.level - 1) + 
+            (int)((statIncrease*int.Parse(Main.savedStats.inputOptions["Critical"])) * multi);
+            __instance.curStats.attackSpeed += (float)(__instance.data.level - 1) + 
+            (int)((statIncrease*int.Parse(Main.savedStats.inputOptions["Attack Speed"])) * multi);
+            __instance.curStats.health += ((__instance.data.level - 1) * 20) + 
+            (int)((statIncrease*int.Parse(Main.savedStats.inputOptions["Health"])) * multi);
             bool flag = __instance.haveTrait("madness");
             __instance.data.s_traits_ids.Clear();
             List<ActorTrait> list = __instance.s_special_effect_traits;
@@ -404,13 +422,13 @@ namespace CommissionMod
 
         public static void updateAge_Postfix(Actor __instance)
         {
-            if (__instance.stats.unit)
+            string talentID = hasTalent(__instance.data);
+            if ((__instance.stats.unit || __instance.stats.animal) && talentID != null)
             {
                 if (__instance.data.age % 2 == 0)
                 {
                     __instance.restoreHealth((int)(__instance.curStats.health*0.1f));
                 }
-                string talentID = hasTalent(__instance.data);
                 __instance.addExperience((int)(Main.savedStats.traits[talentID].passiveExpGain));
             }
         }
@@ -627,7 +645,7 @@ namespace CommissionMod
                 string talentID = hasTalent(pAttacker.a.data);
                 if (talentID != null)
                 {
-                    pAttacker.a.addExperience(Traits.talentIDs[talentID].expGainHit);
+                    pAttacker.a.addExperience((int)(Traits.talentIDs[talentID].expGainHit/2));
                 }
                 else
                 {
@@ -688,7 +706,14 @@ namespace CommissionMod
                 __instance.addTrait("veteran", false);
             }
             string talentID = hasTalent(__instance.data);
-            __instance.addExperience(Main.savedStats.traits[talentID].expGainKill);
+            if (talentID != null)
+            {
+                __instance.addExperience(Main.savedStats.traits[talentID].expGainKill);
+            }
+            else
+            {
+                __instance.addExperience(10);
+            }
             if (__instance.haveTrait("madness"))
             {
                 __instance.restoreHealth(__instance.curStats.health / 15 + 1);
@@ -707,6 +732,99 @@ namespace CommissionMod
                 __instance.addTrait("mageslayer", false);
             }
             return false;
+        }
+
+        public static bool updateUnitSpawn_Prefix()
+        {
+            if (!MapBox.instance.worldLaws.world_law_animals_spawn.boolVal)
+            {
+                return false;
+            }
+            if (MapBox.instance.mapChunkManager.list.Count == 0)
+            {
+                return false;
+            }
+            TileIsland tileIsland = null;
+            if (MapBox.instance.islandsCalculator.islands_ground.Count > 0)
+            {
+                tileIsland = MapBox.instance.islandsCalculator.getRandomIslandGround(true);
+            }
+            if (tileIsland == null)
+            {
+                return false;
+            }
+            WorldTile randomTile = tileIsland.getRandomTile();
+            if (!randomTile.Type.spawn_units_auto)
+            {
+                return false;
+            }
+            ActorStats actorStats = AssetManager.unitStats.get(randomTile.Type.spawn_units_list.GetRandom<string>());
+            if (actorStats == null)
+            {
+                return false;
+            }
+            if (actorStats.currentAmount > actorStats.maxRandomAmount)
+            {
+                return false;
+            }
+            MapBox.instance.getObjectsInChunks(randomTile, 0, MapObjectType.Actor);
+            if (MapBox.instance.temp_map_objects.Count > 3)
+            {
+                return false;
+            }
+            Actor beast = MapBox.instance.spawnNewUnit(actorStats.id, randomTile, string.Empty, 0f);
+            addBeastRank(beast);
+            return false;
+        }
+
+        public static bool spawnNewUnit_Prefix(ref Actor __result, MapBox __instance, string pStatsID, WorldTile pTile, string pJob = "", float pSpawnHeight = 6f)
+        {
+            Actor actor = __instance.createNewUnit(pStatsID, pTile, pJob, pSpawnHeight, null);
+            if (actor.stats.unit)
+            {
+                actor.data.age = 18;
+                for (int i = 0; i < 6; i++)
+                {
+                    actor.data.updateAttributes(actor.stats, actor.race, true);
+                }
+                actor.setKingdom(__instance.kingdoms.dict_hidden["nomads_" + actor.stats.race]);
+                actor.setStatsDirty();
+            }
+            if (actor.stats.animal)
+            {
+                actor.data.hunger = 79;
+                addBeastRank(actor);
+            }
+            actor.setSkinSet(pTile.Type.forceUnitSkinSet);
+            __result = actor;
+            return false;
+        }
+
+        private static void addBeastRank(Actor beast)
+        {
+            bool flag = false;
+            foreach(KeyValuePair<string, SavedTrait> kv in Main.savedStats.traits)
+            {
+                if (kv.Value.type != RankType.Beast)
+                {
+                    continue;
+                }
+                ActorTrait actorTrait = AssetManager.traits.get(kv.Key);
+                if (actorTrait.birth != 0f)
+                {
+                    float num = Toolbox.randomFloat(0f, 100f);
+                    if (actorTrait.birth >= num && !beast.data.traits.Contains(actorTrait.id) && !beast.data.haveOppositeTrait(actorTrait))
+                    {
+                        beast.data.addTrait(actorTrait.id);
+                        flag = true;
+                    }
+                }
+            }
+
+            if (!flag)
+            {
+                beast.data.addTrait("WolfRank");
+            }
         }
     }
 }

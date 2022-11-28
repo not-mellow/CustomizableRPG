@@ -58,7 +58,7 @@ namespace CommissionMod
 
             NCMS.Utils.PowerButtons.CreateButton(
                 "saveLimitsButton",
-                Mod.EmbededResources.LoadSprite($"{Mod.Info.Name}.Resources.UI.save_icon.png"),
+                Mod.EmbededResources.LoadSprite($"{Mod.Info.Name}.Resources.Icons.iconSave.png"),
                 "Save Limits",
                 "Save The Limits To The Settings",
                 new Vector2(130, -195),

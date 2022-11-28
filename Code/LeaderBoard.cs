@@ -21,19 +21,22 @@ namespace CommissionMod
         private static GameObject scrollView;
         private static Dictionary<string, int> talentPriority = new Dictionary<string, int>
         {
-            {"Zeta", 12},
-            {"Sigma", 11},
-            {"Omega", 10},
-            {"EXrank", 13},
-            {"SSSrank", 9},
-            {"SSrank", 8},
-            {"Srank", 7},
-            {"Arank", 6},
-            {"Brank", 5},
-            {"Crank", 4},
-            {"Drank", 3},
-            {"Erank", 2},
-            {"Frank", 1},
+            {"Zeta", 15},
+            {"Sigma", 14},
+            {"Omega", 13},
+            {"EXrank", 16},
+            {"SSSrank", 12},
+            {"SSrank", 11},
+            {"Srank", 10},
+            {"Arank", 9},
+            {"Brank", 8},
+            {"Crank", 7},
+            {"Drank", 6},
+            {"Erank", 5},
+            {"Frank", 4},
+            {"LionRank", 3},
+            {"BearRank", 2},
+            {"WolfRank", 1},
         };
         public static Dictionary<ToggleIcon, string> toggles = new Dictionary<ToggleIcon, string>();
         public static Dictionary<string, bool> filterToggles = new Dictionary<string, bool>();

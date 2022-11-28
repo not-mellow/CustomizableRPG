@@ -11,6 +11,13 @@ using ReflectionUtility;
 
 namespace CommissionMod
 {
+    public enum RankType
+    {
+        Human,
+        Beast,
+        Nothing
+    }
+
     class Traits
     {
         private static List<ActorTrait> addedTalents = new List<ActorTrait>();
@@ -36,7 +43,8 @@ namespace CommissionMod
                 0.05f,
                 250,
                 10,
-                5
+                5,
+                RankType.Human
             );
             createTalentTrait(
                 "Erank",
@@ -49,7 +57,8 @@ namespace CommissionMod
                 0.08f,
                 300,
                 20,
-                10
+                10,
+                RankType.Human
             );
             createTalentTrait(
                 "Drank",
@@ -62,7 +71,8 @@ namespace CommissionMod
                 0.10f,
                 320,
                 30,
-                15
+                15,
+                RankType.Human
             );
             createTalentTrait(
                 "Crank",
@@ -75,7 +85,8 @@ namespace CommissionMod
                 0.15f,
                 350,
                 40,
-                20
+                20,
+                RankType.Human
             );
 
             createTalentTrait(
@@ -89,7 +100,8 @@ namespace CommissionMod
                 0.2f,
                 370,
                 50,
-                25
+                25,
+                RankType.Human
             );
             createTalentTrait(
                 "Arank",
@@ -102,7 +114,8 @@ namespace CommissionMod
                 0.30f,
                 400,
                 60,
-                30
+                30,
+                RankType.Human
             );
             createTalentTrait(
                 "Srank",
@@ -115,7 +128,8 @@ namespace CommissionMod
                 0.3f,
                 450,
                 70,
-                50
+                50,
+                RankType.Human
             );
             createTalentTrait(
                 "SSrank",
@@ -128,7 +142,8 @@ namespace CommissionMod
                 0.35f,
                 480,
                 80,
-                55
+                55,
+                RankType.Human
             );
             createTalentTrait(
                 "SSSrank",
@@ -141,7 +156,8 @@ namespace CommissionMod
                 0.4f,
                 510,
                 90,
-                60
+                60,
+                RankType.Human
             );
             createTalentTrait(
                 "EXrank",
@@ -154,7 +170,8 @@ namespace CommissionMod
                 0.5f,
                 550,
                 100,
-                70
+                70,
+                RankType.Human
             );
             createTalentTrait(
                 "Sigma",
@@ -167,7 +184,8 @@ namespace CommissionMod
                 0f,
                 1,
                 10,
-                1
+                1,
+                RankType.Human
             );
             createTalentTrait(
                 "Omega",
@@ -180,7 +198,8 @@ namespace CommissionMod
                 0f,
                 1,
                 10,
-                1
+                1,
+                RankType.Human
             );
             createTalentTrait(
                 "Zeta",
@@ -193,14 +212,57 @@ namespace CommissionMod
                 0f,
                 1,
                 10,
-                1
+                1,
+                RankType.Human
+            );
+            createTalentTrait(
+                "WolfRank",
+                "ui/Icons/iconWolfRank",
+                "Lion Rank",
+                "The Lowest Beast Rank",
+                0f,
+                newStats,
+                100,
+                0.1f,
+                100,
+                50,
+                25,
+                RankType.Beast
+            );
+            createTalentTrait(
+                "BearRank",
+                "ui/Icons/iconBearRank",
+                "Bear Rank",
+                "The Middle Beast Rank",
+                10f,
+                newStats,
+                150,
+                0.3f,
+                200,
+                70,
+                50,
+                RankType.Beast
+            );
+            createTalentTrait(
+                "LionRank",
+                "ui/Icons/iconLionRank",
+                "Lion Rank",
+                "The Highest Beast Rank",
+                0.05f,
+                newStats,
+                200,
+                0.5f,
+                500,
+                100,
+                100,
+                RankType.Beast
             );
 
             addTalentList();
         }
 
         private static void createTalentTrait(string newID, string icon, string title, string desc, float newBirth, 
-        BaseStats newStats, int expGainKillMod, float percentageMod, int passive, int levelCap, int expGainHitMod)
+        BaseStats newStats, int expGainKillMod, float percentageMod, int passive, int levelCap, int expGainHitMod, RankType rankType)
         {
             Localization.AddOrSet($"trait_{newID}", title);
             Localization.AddOrSet($"trait_{newID}_info", desc);
@@ -230,7 +292,8 @@ namespace CommissionMod
                 spawnRate = newBirth,
                 decreaseEXPRequirement = percentageMod,
                 passiveExpGain = passive,
-                talentLevelCap = levelCap
+                talentLevelCap = levelCap,
+                type = rankType
             };
             if (Main.hasSettings && Main.savedStats.traits.ContainsKey(talent.id))
             {
@@ -240,7 +303,18 @@ namespace CommissionMod
                 {
                     int ivalue = 0;
                     float fvalue = 0f;
-                    if (field.FieldType != typeof(int))
+                    if (field.FieldType != typeof(int) && field.FieldType != typeof(float))
+                    {
+                        if (field.FieldType == typeof(RankType))
+                        {
+                            if ((RankType)(field.GetValue(currentSavedTrait)) == RankType.Nothing)
+                            {
+                                currentSavedTrait.type = rankType;
+                            }
+                        }
+                        continue;
+                    }
+                    else if (field.FieldType != typeof(int))
                     {
                         fvalue = (float)(field.GetValue(currentSavedTrait));
                     }
@@ -288,5 +362,6 @@ namespace CommissionMod
         public float decreaseEXPRequirement = -1f;
         public int passiveExpGain = -1;
         public int talentLevelCap = -1;
+        public RankType type = RankType.Nothing;
     }
 }

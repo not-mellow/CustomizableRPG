@@ -20,6 +20,7 @@ namespace CommissionMod
         public static Dictionary<string, string> inputOptions = new Dictionary<string, string>();
         public static Dictionary<string, bool> boolOptions = new Dictionary<string, bool>();
         private static GameObject settingContents;
+        private static GameObject scrollView;
 
         public static void init()
         {
@@ -69,9 +70,9 @@ namespace CommissionMod
 
             createStatOption(
                 "Stat Boost Per Level Leap",
-                new List<string>{"Damage", "Armor", "Critical", "Attack Speed", "Health"},
+                new List<string>{"Damage", "Armor", "Critical", "Attack Speed", "Health", "Multiplier"},
                 -340,
-                new List<string>{"75", "0", "5", "5", "600"}
+                new List<string>{"75", "0", "5", "5", "600", "0.0"}
             );
 
             createStatOption(
@@ -101,16 +102,14 @@ namespace CommissionMod
                 index++;
             }
 
-            NCMS.Utils.PowerButtons.CreateButton(
-                "saveSettingsButton",
-                Mod.EmbededResources.LoadSprite($"{Mod.Info.Name}.Resources.UI.save_icon.png"),
+            Button saveButton = createBGButton(
+                scrollView,
+                50,
+                "Save",
                 "Save Changes",
-                "Save The Changes To The Settings",
-                new Vector2(130, -2650),
-                ButtonType.Click,
-                settingContents.transform,
-                Main.saveStats
+                "Save The Changes To The Settings File"
             );
+            saveButton.onClick.AddListener(Main.saveStats);
         }
 
         private static void addButtons()
@@ -212,7 +211,7 @@ namespace CommissionMod
             ScrollWindow window;
             window = Windows.CreateNewWindow(id, title);
 
-            var scrollView = GameObject.Find($"/Canvas Container Main/Canvas - Windows/windows/{window.name}/Background/Scroll View");
+            scrollView = GameObject.Find($"/Canvas Container Main/Canvas - Windows/windows/{window.name}/Background/Scroll View");
             scrollView.gameObject.SetActive(true);
 
             settingContents = GameObject.Find($"/Canvas Container Main/Canvas - Windows/windows/{window.name}/Background/Scroll View/Viewport/Content");
@@ -347,6 +346,15 @@ namespace CommissionMod
             int index = 0;
             foreach (FieldInfo field in trait.GetType().GetFields())
             {
+                bool isInt = true;
+                if (field.FieldType != typeof(int) && field.FieldType != typeof(float))
+                {
+                    continue;
+                }
+                else if (field.FieldType != typeof(int))
+                {
+                    isInt = false;
+                }
 
                 Text fieldNameText = addText(field.Name, statHolder, 15, new Vector3(-140, 100 + (-55*index), 0));
                 fieldNameText.alignment = TextAnchor.MiddleLeft;
@@ -355,11 +363,6 @@ namespace CommissionMod
 
                 GameObject inputField = Instantiate(inputRef, statHolder.transform);
                 NameInput nameInputComp = inputField.GetComponent<NameInput>();
-                bool isInt = true;
-                if (field.FieldType != typeof(int))
-                {
-                    isInt = false;
-                }
                 textValue = (string)(field.GetValue(trait).ToString());
                 // Debug.Log($"{field.Name}: {textValue}");
                 // if (Main.hasSettings)
@@ -446,6 +449,26 @@ namespace CommissionMod
             }
             inputOptions.Add(option, value);
             return value;
+        }
+
+        public static Button createBGButton(GameObject parent, int posY, string iconName, string buttonName, string buttonDesc)
+        {
+            PowerButton button = PowerButtons.CreateButton(
+                buttonName,
+                Mod.EmbededResources.LoadSprite($"{Mod.Info.Name}.Resources.Icons.icon{iconName}.png"),
+                buttonName,
+                buttonDesc,
+                new Vector2(118, posY),
+                ButtonType.Click,
+                parent.transform,
+                null
+            );
+
+            Image buttonBG = button.gameObject.GetComponent<Image>();
+            buttonBG.sprite = Mod.EmbededResources.LoadSprite($"{Mod.Info.Name}.Resources.UI.backgroundTabButton.png");
+            Button buttonButton = button.gameObject.GetComponent<Button>();
+
+            return buttonButton;
         }
     }
 }
