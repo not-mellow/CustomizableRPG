@@ -14,15 +14,35 @@ This will vary between ranks. (KINDA DONE)
 8. Maybe like every 1k years, random boss creature ' rhino, buffalo, hyena ' and killing it can give say damage or speed by 10 or something.
 
 Adiniz Suggestions
-1. Make hits and kills exp gain customizable (DONE)
 
 Archeron Suggestions
-1. Kingdom and village filters for both level and talent stats windows (IN PROGRESS)
-2. Customizable level cap per talent (DONE)
 
 Poh Suggestions
 1. Ability to follow favorited weapons
 2. Crafting
 
 Nguynah Suggestions
-1. Add stat multiplier
+
+Beta Version 0.4.2
+- Moved save button to side for ease of access
+- Added 3 beast traits (wolf/bear/lion)
+- Every animal spawned will have a beast rank depending on spawn rate(remember when changing spawn rate in the settings, you need to restart the game for the change to work)
+- I think I fixed the problem with the units not spawning anymore
+- Fixed some more json problems
+- (the other features added are what I gave you earlier today)
+- (STILL In Progress) Beast Boss trait
+- (STILL In Progress) Boss that will spawn randomly and spawn minions
+- (done) Stat Multiplier Option in settings
+
+Beta Version 0.4.5 - Small Fixes Update
+- Added seperate leader board window for beasts
+- Added refresh saved settings for new updates
+- Added some new icons for buttons
+- Improved UI code
+- Fixed Leader Board Bug When Searching In Talents
+- Fixed other minor bugs
+- Changed button positions
+- (STILL In Progress) Beast Boss trait
+- (STILL In Progress) Boss that will spawn randomly and spawn minions
+- (done) Stat Multiplier Option in settings
+This is just small update for a few fixes and tweaks

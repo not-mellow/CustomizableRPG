@@ -22,7 +22,9 @@ namespace CommissionMod
 
         public static void init()
         {
-            addLimitWindow("statLimitWindow", "Stat Limits Window");
+            UI.addNewWindow("statLimitWindow", "Stat Limits Window");
+            limitContents = UI.windowContents["statLimitWindow"];
+            scrollView = UI.windowScrollView["statLimitWindow"];
 
             createStatLimiter(
                 "ArmorLimit",
@@ -115,17 +117,6 @@ namespace CommissionMod
         public static void openWindow()
         {
             Windows.ShowWindow("statLimitWindow");
-        }
-
-        private static void addLimitWindow(string id, string title)
-        {
-            ScrollWindow window;
-            window = Windows.CreateNewWindow(id, title);
-
-            scrollView = GameObject.Find($"/Canvas Container Main/Canvas - Windows/windows/{window.name}/Background/Scroll View");
-            scrollView.gameObject.SetActive(true);
-
-            limitContents = GameObject.Find($"/Canvas Container Main/Canvas - Windows/windows/{window.name}/Background/Scroll View/Viewport/Content");
         }
     }
 }

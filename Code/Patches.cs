@@ -823,7 +823,7 @@ namespace CommissionMod
 
             if (!flag)
             {
-                beast.data.addTrait("WolfRank");
+                beast.data.addTrait("Wolfrank");
             }
         }
     }

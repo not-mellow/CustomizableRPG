@@ -15,10 +15,12 @@ using ReflectionUtility;
 
 namespace CommissionMod
 {
-    class LeaderBoard : MonoBehaviour
+    class BeastBoardWindow : MonoBehaviour
     {
-        private static GameObject boardContents;
+        private static GameObject beastContents;
         private static GameObject scrollView;
+        public static Dictionary<ToggleIcon, string> toggles = new Dictionary<ToggleIcon, string>();
+        public static Dictionary<string, bool> filterToggles = new Dictionary<string, bool>();
         private static Dictionary<string, int> talentPriority = new Dictionary<string, int>
         {
             {"Zeta", 15},
@@ -38,57 +40,33 @@ namespace CommissionMod
             {"Bearrank", 2},
             {"Wolfrank", 1},
         };
-        public static Dictionary<ToggleIcon, string> toggles = new Dictionary<ToggleIcon, string>();
-        public static Dictionary<string, bool> filterToggles = new Dictionary<string, bool>();
 
         public static void init()
         {
-            UI.addNewWindow("leaderBoardWindow", "Civ Leader Board");
-            boardContents = UI.windowContents["leaderBoardWindow"];
-            scrollView = UI.windowScrollView["leaderBoardWindow"];
+            UI.addNewWindow("beastBoardWindow", "Beast Board Window");
+            beastContents = UI.windowContents["beastBoardWindow"];
+            scrollView = UI.windowScrollView["beastBoardWindow"];
 
-            Button levelButton = createLeaderBoardFilter(scrollView, "levels", 80, "Levels", "LevelsFilter", "Search Units By Level");
-            levelButton.onClick.AddListener(() => searchUnits("levels", getUnitList()));
-            Button talentButton = createLeaderBoardFilter(scrollView, "talents", 50, "Talents", "TalentsFilter", "Search Units By Talent");
-            talentButton.onClick.AddListener(() => searchUnits("talents", getUnitList()));
-            Button killsButton = createLeaderBoardFilter(scrollView, "kills", 20, "Kills", "KillsFilter", "Search Units By Kills");
-            killsButton.onClick.AddListener(() => searchUnits("kills", getUnitList()));
-            Button ageButton = createLeaderBoardFilter(scrollView, "age", -10, "Age", "AgeFilter", "Search Units By Age");
-            ageButton.onClick.AddListener(() => searchUnits("age", getUnitList()));
-            Button dmgButton = createLeaderBoardFilter(scrollView, "dmg", -40, "DMG", "DMGFilter", "Search Units By Damage");
-            dmgButton.onClick.AddListener(() => searchUnits("dmg", getUnitList()));
-            Button kingdomFilterButton = createLeaderBoardFilter(scrollView, "kingdomFilter", -70, "GoldCrown", "KingdomFilter", "Search Units By Kingdom Filter");
-            kingdomFilterButton.onClick.AddListener(FilterWindow.openKingdomWindow);
-            Button cityFilterButton = createLeaderBoardFilter(scrollView, "cityFilter", -100, "SilverCrown", "CityFilter", "Search Units By City Filter");
-            cityFilterButton.onClick.AddListener(FilterWindow.openCityWindow);
-        }
-
-        private static List<Actor> getUnitList()
-        {
-            if (FilterWindow.kingdomFilter != null)
-            {
-                return FilterWindow.kingdomFilter.units.getSimpleList();
-            }
-            else if (FilterWindow.cityFilter != null)
-            {
-                return FilterWindow.cityFilter.units.getSimpleList();
-            }
-            return MapBox.instance.units.getSimpleList();
-        }
-
-        public static void openWindow()
-        {
-            Windows.ShowWindow("leaderBoardWindow");
+            Button levelButton = createLeaderBoardFilter(scrollView, "levels", 80, "Levels", "BeastLevelsFilter", "Search Beasts By Level");
+            levelButton.onClick.AddListener(() => searchUnits("levels", MapBox.instance.units.getSimpleList()));
+            Button talentButton = createLeaderBoardFilter(scrollView, "talents", 50, "Talents", "BeastTalentsFilter", "Search Beasts By Talent");
+            talentButton.onClick.AddListener(() => searchUnits("talents", MapBox.instance.units.getSimpleList()));
+            Button killsButton = createLeaderBoardFilter(scrollView, "kills", 20, "Kills", "BeastKillsFilter", "Search Beasts By Kills");
+            killsButton.onClick.AddListener(() => searchUnits("kills", MapBox.instance.units.getSimpleList()));
+            Button ageButton = createLeaderBoardFilter(scrollView, "age", -10, "Age", "BeastAgeFilter", "Search Beasts By Age");
+            ageButton.onClick.AddListener(() => searchUnits("age", MapBox.instance.units.getSimpleList()));
+            Button dmgButton = createLeaderBoardFilter(scrollView, "dmg", -40, "DMG", "BeastDMGFilter", "Search Beasts By Damage");
+            dmgButton.onClick.AddListener(() => searchUnits("dmg", MapBox.instance.units.getSimpleList()));
         }
 
         public static void searchUnits(string sortName, List<Actor> unitList)
         {
-            foreach(Transform child in boardContents.transform)
+            foreach(Transform child in beastContents.transform)
             {
                 Destroy(child.gameObject);
             }
             List<Actor> filteredList = sortUnits(sortName, unitList);
-            RectTransform contentRect = boardContents.GetComponent<RectTransform>();
+            RectTransform contentRect = beastContents.GetComponent<RectTransform>();
             contentRect.sizeDelta = new Vector2(0, 207 + (filteredList.Count * 70));
             for(int i = 0; i < filteredList.Count; i++)
             {
@@ -97,7 +75,7 @@ namespace CommissionMod
                 {
                     continue;
                 }
-                UI.addNewWindowElement(boardContents, i, actor, sortName);
+                UI.addNewWindowElement(beastContents, i, actor, sortName);
             }
         }
 
@@ -116,7 +94,7 @@ namespace CommissionMod
                 int num = 0;
                 foreach(Actor actor2 in copiedList)
                 {
-                    if (actor2.stats.animal || !actor2.stats.unit)
+                    if (!actor2.stats.animal)
                     {
                         continue;
                     }
@@ -200,16 +178,12 @@ namespace CommissionMod
                 KeyValuePair<string, bool> kv = filterToggles.ElementAt(i);
                 filterToggles[kv.Key] = false;
             }
-            if (name == "kingdomFilter" || name == "cityFilter")
-            {
-                return;
-            }
             filterToggles[name] = true;
             updateToggledIcons();
             toggleIcon.updateIcon(true);
         }
 
-        public static void updateToggledIcons()
+        private static void updateToggledIcons()
         {
             List<string> trueFilters = new List<string>();
             foreach(KeyValuePair<string, bool> kv in filterToggles)
@@ -221,7 +195,7 @@ namespace CommissionMod
             }
             foreach(KeyValuePair<ToggleIcon, string> kv in toggles)
             {
-                if ((kv.Value == "kingdomFilter" && FilterWindow.kingdomFilter != null) || (kv.Value == "cityFilter" && FilterWindow.cityFilter != null) || trueFilters.Contains(kv.Value))
+                if (trueFilters.Contains(kv.Value))
                 {
                     kv.Key.updateIcon(true);
                     continue;

@@ -25,7 +25,9 @@ namespace CommissionMod
 
         public static void init()
         {
-            addFilterWindow("filterWindow", "Filters Window");
+            UI.addNewWindow("filterWindow", "Filters Window");
+            filterContents = UI.windowContents["filterWindow"];
+            scrollView = UI.windowScrollView["filterWindow"];
         }
 
         public static void openKingdomWindow()
@@ -286,17 +288,6 @@ namespace CommissionMod
                 }
             }
             return sortName;
-        }
-
-        private static void addFilterWindow(string id, string title)
-        {
-            ScrollWindow window;
-            window = Windows.CreateNewWindow(id, title);
-
-            scrollView = GameObject.Find($"/Canvas Container Main/Canvas - Windows/windows/{window.name}/Background/Scroll View");
-            scrollView.gameObject.SetActive(true);
-
-            filterContents = GameObject.Find($"/Canvas Container Main/Canvas - Windows/windows/{window.name}/Background/Scroll View/Viewport/Content");
         }
     }
 }

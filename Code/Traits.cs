@@ -216,7 +216,7 @@ namespace CommissionMod
                 RankType.Human
             );
             createTalentTrait(
-                "WolfRank",
+                "Wolfrank",
                 "ui/Icons/iconWolfRank",
                 "Lion Rank",
                 "The Lowest Beast Rank",
@@ -230,7 +230,7 @@ namespace CommissionMod
                 RankType.Beast
             );
             createTalentTrait(
-                "BearRank",
+                "Bearrank",
                 "ui/Icons/iconBearRank",
                 "Bear Rank",
                 "The Middle Beast Rank",
@@ -244,7 +244,7 @@ namespace CommissionMod
                 RankType.Beast
             );
             createTalentTrait(
-                "LionRank",
+                "Lionrank",
                 "ui/Icons/iconLionRank",
                 "Lion Rank",
                 "The Highest Beast Rank",
