@@ -21,6 +21,7 @@ namespace CommissionMod
     {
         public static SavedStats savedStats = new SavedStats();
         public static bool hasSettings = false;
+        public static string correctSettingsVersion = "0.4.6";
         public static bool refreshSettings = false;
         private static bool modLoaded = false;
         // void Awake()
@@ -46,6 +47,7 @@ namespace CommissionMod
             }
             Patches.init();
             GodPowers.init();
+            Disasters.init();
             Traits.init();
             UI.init();
             SettingsWindow.init();
@@ -65,9 +67,10 @@ namespace CommissionMod
         {
             string data = File.ReadAllText($"{ModDeclaration.Info.NCMSModsPath}/CommissionModSettings.json");
             SavedStats loadedData = JsonConvert.DeserializeObject<SavedStats>(data);
-            if (loadedData.refreshSettings)
+            if (loadedData.settingsVersion != correctSettingsVersion)
             {
                 refreshSettings = true;
+                Debug.Log("1 resfreshed settings");
                 return;
             }
             savedStats = loadedData;
@@ -82,7 +85,7 @@ namespace CommissionMod
             
             savedStats.inputOptions = UI.inputOptions;
 
-            savedStats.refreshSettings = false;
+            savedStats.settingsVersion = correctSettingsVersion;
 
             string json = JsonConvert.SerializeObject(savedStats, Formatting.Indented);
             File.WriteAllText($"{ModDeclaration.Info.NCMSModsPath}/CommissionModSettings.json", json);
@@ -98,6 +101,8 @@ namespace CommissionMod
             }
             
             savedStats.inputOptions = UI.inputOptions;
+            
+            savedStats.settingsVersion = correctSettingsVersion;
 
             string json = JsonConvert.SerializeObject(savedStats, Formatting.Indented);
             File.WriteAllText($"{ModDeclaration.Info.NCMSModsPath}/CommissionModSettings.json", json);
@@ -133,7 +138,7 @@ namespace CommissionMod
 
     public class SavedStats
     {
-        public bool refreshSettings = true;
+        public string settingsVersion = "";
 
         public Dictionary<string, SavedTrait> traits = new Dictionary<string, SavedTrait>();
 

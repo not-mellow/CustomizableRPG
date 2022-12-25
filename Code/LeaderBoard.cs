@@ -21,6 +21,7 @@ namespace CommissionMod
         private static GameObject scrollView;
         private static Dictionary<string, int> talentPriority = new Dictionary<string, int>
         {
+            {"AnimalBossrank", 16},
             {"Zeta", 15},
             {"Sigma", 14},
             {"Omega", 13},

@@ -257,6 +257,29 @@ namespace CommissionMod
                 100,
                 RankType.Beast
             );
+            BaseStats bossStats = new BaseStats{
+                knockbackReduction = 100f,
+                damage = 30,
+                crit = 10f,
+                speed = 10f,
+                health = 100,
+                armor = 15,
+                scale = 0.1f
+            };
+            createTalentTrait(
+                "AnimalBossrank",
+                "ui/Icons/iconBossRank",
+                "Boss Rank",
+                "The Highest Beast Rank",
+                0f,
+                bossStats,
+                200,
+                0.5f,
+                500,
+                80,
+                100,
+                RankType.Beast
+            );
 
             addTalentList();
         }
@@ -298,41 +321,46 @@ namespace CommissionMod
             if (Main.hasSettings && Main.savedStats.traits.ContainsKey(talent.id))
             {
                 SavedTrait currentSavedTrait = Main.savedStats.traits[talent.id];
-                bool useSavedTrait = true;
-                foreach (FieldInfo field in currentSavedTrait.GetType().GetFields())
-                {
-                    int ivalue = 0;
-                    float fvalue = 0f;
-                    if (field.FieldType != typeof(int) && field.FieldType != typeof(float))
-                    {
-                        if (field.FieldType == typeof(RankType))
-                        {
-                            if ((RankType)(field.GetValue(currentSavedTrait)) == RankType.Nothing)
-                            {
-                                currentSavedTrait.type = rankType;
-                            }
-                        }
-                        continue;
-                    }
-                    else if (field.FieldType != typeof(int))
-                    {
-                        fvalue = (float)(field.GetValue(currentSavedTrait));
-                    }
-                    else
-                    {
-                        ivalue = (int)(field.GetValue(currentSavedTrait));
-                    }
-                    if (ivalue < 0 || fvalue < 0)
-                    {
-                        useSavedTrait = false;
-                        break;
-                    }
-                }
-                if (useSavedTrait)
-                {
-                    newTrait = currentSavedTrait;
-                }
+                newTrait = currentSavedTrait;
             }
+            // if (Main.hasSettings && Main.savedStats.traits.ContainsKey(talent.id))
+            // {
+            //     SavedTrait currentSavedTrait = Main.savedStats.traits[talent.id];
+            //     bool useSavedTrait = true;
+            //     foreach (FieldInfo field in currentSavedTrait.GetType().GetFields())
+            //     {
+            //         int ivalue = 0;
+            //         float fvalue = 0f;
+            //         if (field.FieldType != typeof(int) && field.FieldType != typeof(float))
+            //         {
+            //             if (field.FieldType == typeof(RankType))
+            //             {
+            //                 if ((RankType)(field.GetValue(currentSavedTrait)) == RankType.Nothing)
+            //                 {
+            //                     currentSavedTrait.type = rankType;
+            //                 }
+            //             }
+            //             continue;
+            //         }
+            //         else if (field.FieldType != typeof(int))
+            //         {
+            //             fvalue = (float)(field.GetValue(currentSavedTrait));
+            //         }
+            //         else
+            //         {
+            //             ivalue = (int)(field.GetValue(currentSavedTrait));
+            //         }
+            //         if (ivalue < 0 || fvalue < 0)
+            //         {
+            //             useSavedTrait = false;
+            //             break;
+            //         }
+            //     }
+            //     if (useSavedTrait)
+            //     {
+            //         newTrait = currentSavedTrait;
+            //     }
+            // }
             talentIDs.Add(talent.id, newTrait);
         }
 
@@ -356,12 +384,12 @@ namespace CommissionMod
 
     public class SavedTrait
     {
-        public int expGainKill = -1;
-        public int expGainHit = -1;
-        public float spawnRate = -1f;
-        public float decreaseEXPRequirement = -1f;
-        public int passiveExpGain = -1;
-        public int talentLevelCap = -1;
+        public int expGainKill;
+        public int expGainHit;
+        public float spawnRate;
+        public float decreaseEXPRequirement;
+        public int passiveExpGain;
+        public int talentLevelCap;
         public RankType type = RankType.Nothing;
     }
 }

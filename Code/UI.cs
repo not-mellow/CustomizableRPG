@@ -500,9 +500,9 @@ namespace CommissionMod
                 case "talents":
                     string talentName = Main.hasTalent(actor.data);
                     string[] talent = talentName.Split('r');
-                    if (talentName == "BearRank")
+                    if (talentName == "Bearrank")
                     {
-                        talent[0] = "BearRank";
+                        talent[0] = "Bear";
                     }
                     GameObject talentText = UI.addText($"{talent[0]}", bgElement, 50, new Vector3(140, 5, 0),20).gameObject;
                     break;

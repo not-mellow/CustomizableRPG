@@ -581,15 +581,10 @@ namespace CommissionMod
             int num = (int)((float)pTarget.curStats.health * 0.1f) + 1;
             if (pTarget.isActor())
             {
-                int trueDMG = 0;
-                if (pTarget.a.data.level > 9)
+                float lvlPercentage = ((float)pTarget.a.data.level/100f)*(float)pTarget.curStats.health;
+                if (pTarget.a.data.level < 9 || pTarget.a.data.health > lvlPercentage + 50f)
                 {
-                    int intFlag = (pTarget.a.data.health+1) - num;
-                    trueDMG = (intFlag > 0)? 0:intFlag;
-                }
-                if (pTarget.a.data.level < 9 || pTarget.a.data.health > pTarget.a.data.level*2)
-                {
-                    pTarget.getHit((float)num + trueDMG, true, AttackType.Fire, null, true);
+                    pTarget.getHit((float)num, true, AttackType.Fire, null, true);
                 }
             }
             if (!MapBox.instance.qualityChanger.lowRes && Toolbox.randomChance(0.1f))
@@ -773,7 +768,10 @@ namespace CommissionMod
                 return false;
             }
             Actor beast = MapBox.instance.spawnNewUnit(actorStats.id, randomTile, string.Empty, 0f);
-            addBeastRank(beast);
+            if (actorStats.animal)
+            {
+                addBeastRank(beast);
+            }
             return false;
         }
 
