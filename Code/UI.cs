@@ -194,6 +194,65 @@ namespace CommissionMod
             return statHolder;
         }
 
+        public static Button createBoolOption(string objName, string title, string desc, int posY, GameObject parent, bool boolValue = false)
+        {
+            // GameObject boolHolder = new GameObject("OptionHolder");
+            // boolHolder.transform.SetParent(parent.transform);
+            // Image boolImage = boolHolder.AddComponent<Image>();
+            // boolImage.sprite = Mod.EmbededResources.LoadSprite($"{Mod.Info.Name}.Resources.UI.windowInnerSliced.png");
+            // RectTransform boolHolderRect = boolHolder.GetComponent<RectTransform>();
+            // boolHolderRect.localPosition = new Vector3(130, posY, 0);
+            // boolHolderRect.sizeDelta = new Vector2(200, 100);
+
+            // Text boolText = addText(title, boolHolder, 20, new Vector3(0, 20, 0));
+            // RectTransform boolTextRect = boolText.gameObject.GetComponent<RectTransform>();
+            // boolTextRect.sizeDelta = new Vector2(boolTextRect.sizeDelta.x, 80);
+
+            // Text descText = addText(desc, boolHolder, 20, new Vector3(0, -60, 0));
+            // RectTransform descTextRect = descText.gameObject.GetComponent<RectTransform>();
+            // descTextRect.sizeDelta = new Vector2(descTextRect.sizeDelta.x, 80);
+
+            PowerButton boolButton = NCMS.Utils.PowerButtons.CreateButton(
+                objName,
+                NCMS.Utils.Sprites.LoadSprite($"{Mod.Info.Path}/icon.png"),
+                title,
+                desc,
+                new Vector2(130, posY),
+                ButtonType.Click,
+                parent.transform,
+                null
+            );
+
+            if (Main.hasSettings)
+            {
+                boolValue = Main.getSavedBool(objName, boolValue);
+            }
+
+            GameObject toggleHolder = new GameObject("ToggleIcon");
+            toggleHolder.transform.SetParent(boolButton.gameObject.transform);
+            Image toggleImage = toggleHolder.AddComponent<Image>();
+            ToggleIcon toggleIcon = toggleHolder.AddComponent<ToggleIcon>();
+            toggleIcon.spriteON = Mod.EmbededResources.LoadSprite($"{Mod.Info.Name}.Resources.UI.buttonToggleIndicator0.png");
+            toggleIcon.spriteOFF = Mod.EmbededResources.LoadSprite($"{Mod.Info.Name}.Resources.UI.buttonToggleIndicator1.png");
+            toggleIcon.updateIcon(boolValue);
+
+            RectTransform toggleRect = toggleHolder.GetComponent<RectTransform>();
+            toggleRect.localPosition = new Vector3(0, 15, 0);
+            toggleRect.sizeDelta = new Vector2(8, 7);
+            
+            Button buttonButton = boolButton.gameObject.GetComponent<Button>();
+            buttonButton.onClick.AddListener(() => changeBool(objName, toggleIcon));
+
+            boolOptions.Add(objName, boolValue);
+            return buttonButton;
+        }
+
+        private static void changeBool(string boolName, ToggleIcon toggleIcon)
+        {
+            boolOptions[boolName] = !boolOptions[boolName];
+            toggleIcon.updateIcon(boolOptions[boolName]);
+        }
+
         public static void createStatOption(string objName, List<string> statNames, int posY, List<string> textValues, GameObject parent)
         {
             GameObject statHolder = new GameObject("OptionHolder");

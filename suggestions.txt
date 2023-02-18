@@ -46,3 +46,26 @@ Beta Version 0.4.5 - Small Fixes Update
 - (STILL In Progress) Boss that will spawn randomly and spawn minions
 - (done) Stat Multiplier Option in settings
 This is just small update for a few fixes and tweaks
+
+Beta Version 0.5.0 - Animals Update
+- Reorganized and replaced button icons for better UI.
+- Seperated expGain into 2 thanks to Adiniz's Suggestion(expGainKill/expGainHit)
+- expGainKill is the exp gained when they kill someone 
+- expGainHit is the exp gained when they hit someone
+- Added talentLevelCap which only caps the level of the person with that specific talent
+- Moved save button to side for ease of access
+- Added 4 beast traits (wolf/bear/lion/boss)
+- Every animal spawned will have a beast rank depending on spawn rate(remember when changing spawn rate in the settings, you need to restart the game for the change to work)
+- Fixed some more json problems
+- Older versions of saved settings files will be refreshed. So make sure that you remember your previous settings before opening the new version.
+(this is for removing bugs when updating the mod)
+- Added the ability for animals with boss traits to randomly spawn in random parts of the world(this is can be turned on or off in settings)
+- Added stat muliplier(this is customizable in the settings)
+
+- Just fixed fire resistance (thanks to nguyenanh for pointing out the error)
+Info on how it works:
+1. if a unit is below the first level leap(below level 10), then they can't resist the fire at all. They will have to depend on how much health they have to wait out the fire or swim.
+2. The effectiveness of the fire resistance depends on the level of the unit.
+For example:
+A level 10 unit's fire resistance will only prevent damage when the unit's health is at 10%-20%, thus making them have almost no health.
+A level 50 unit's fire resistance will only prevent damage when the unit's health is at 50% or so, thus only taking half of his health

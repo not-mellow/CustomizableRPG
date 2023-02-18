@@ -81,7 +81,7 @@ namespace CommissionMod
             );
 
             UI.createStatOption(
-                "DMG Reduct Per LVL Leap",
+                "DMG Protection Per Leap",
                 new List<string>{"InitialLevel", "DMGReductionPercent"},
                 -460,
                 new List<string>{"10", "0.5"},
@@ -97,13 +97,23 @@ namespace CommissionMod
                 "1"
             );
 
+            Button bossSpawnButton = UI.createBoolOption(
+                "bossSpawnOption", 
+                "Random Boss Spawning", 
+                "If this option and natural disaster are turned on. Bosses have a chance of spawning randomly around the world.", 
+                -590, 
+                settingContents, 
+                false
+            );
+            bossSpawnButton.onClick.AddListener(() => Disasters.changeBossDisasterRate("bossSpawnOption", 20, 0));
+
             int index = 0;
             foreach(KeyValuePair<string, SavedTrait> kv in Traits.talentIDs)
             {
                 UI.createTraitOption(
                     kv.Key,
                     kv.Value,
-                    -630 + (-index*160),
+                    -690 + (-index*160),
                     settingContents
                 );
                 index++;
