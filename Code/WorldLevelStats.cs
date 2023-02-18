@@ -18,11 +18,14 @@ namespace CommissionMod
     class WorldLevelStats : MonoBehaviour
     {
         private static GameObject statsContents;
+        private static GameObject scrollView;
         private static Dictionary<string, int> levelStats = new Dictionary<string, int>();
 
         public static void init()
         {
-            addWorldStatsWindow("levelStatsWindow", "World Level Stats");
+            UI.addNewWindow("levelStatsWindow", "World Level Stats");
+            statsContents = UI.windowContents["levelStatsWindow"];
+            scrollView = UI.windowScrollView["levelStatsWindow"];
         }
 
         public static void openWindow()

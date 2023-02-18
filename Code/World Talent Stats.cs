@@ -18,11 +18,14 @@ namespace CommissionMod
     class WorldTalentStats : MonoBehaviour
     {
         private static GameObject statsContents;
+        private static GameObject scrollView;
         private static Dictionary<string, int> talentStats = new Dictionary<string, int>();
 
         public static void init()
         {
-            addWorldStatsWindow("talentStatsWindow", "World Talent Stats");
+            UI.addNewWindow("talentStatsWindow", "World Talent Stats");
+            statsContents = UI.windowContents["talentStatsWindow"];
+            scrollView = UI.windowScrollView["talentStatsWindow"];
         }
 
         public static void openWindow()
@@ -41,7 +44,7 @@ namespace CommissionMod
             List<Actor> unitList = MapBox.instance.units.getSimpleList();
             foreach(Actor actor in unitList)
             {
-                string talent = hasTalent(actor.data);
+                string talent = Main.hasTalent(actor.data);
                 if (talent == null)
                 {
                     continue;
@@ -68,29 +71,6 @@ namespace CommissionMod
                 UI.addText(kv.Value.ToString(), statsContents, 10, new Vector3(200, -25 + (index*-25)));
                 index++;
             }
-        }
-
-        private static string hasTalent(ActorStatus status)
-        {
-            foreach(KeyValuePair<string, SavedTrait> kv in Traits.talentIDs)
-            {
-                if (status.haveTrait(kv.Key))
-                {
-                    return kv.Key;
-                }
-            }
-            return null;
-        }
-
-        private static void addWorldStatsWindow(string id, string title)
-        {
-            ScrollWindow window;
-            window = Windows.CreateNewWindow(id, title);
-
-            var scrollView = GameObject.Find($"/Canvas Container Main/Canvas - Windows/windows/{window.name}/Background/Scroll View");
-            scrollView.gameObject.SetActive(true);
-
-            statsContents = GameObject.Find($"/Canvas Container Main/Canvas - Windows/windows/{window.name}/Background/Scroll View/Viewport/Content");
         }
     }
 }
