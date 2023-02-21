@@ -40,7 +40,7 @@ namespace CommissionMod
 
         public void fixedInit()
         {
-            if (File.Exists($"{ModDeclaration.Info.NCMSModsPath}/CommissionModSettings.json"))
+            if (File.Exists($"{Core.NCMSModsPath}/CommissionModSettings.json"))
             {
                 loadStats();
                 hasSettings = true;
@@ -65,7 +65,7 @@ namespace CommissionMod
 
         private static void loadStats()
         {
-            string data = File.ReadAllText($"{ModDeclaration.Info.NCMSModsPath}/CommissionModSettings.json");
+            string data = File.ReadAllText($"{Core.NCMSModsPath}/CommissionModSettings.json");
             SavedStats loadedData = JsonConvert.DeserializeObject<SavedStats>(data);
             if (loadedData.settingsVersion != correctSettingsVersion)
             {
@@ -89,12 +89,12 @@ namespace CommissionMod
             savedStats.settingsVersion = correctSettingsVersion;
 
             string json = JsonConvert.SerializeObject(savedStats, Formatting.Indented);
-            File.WriteAllText($"{ModDeclaration.Info.NCMSModsPath}/CommissionModSettings.json", json);
+            File.WriteAllText($"{Core.NCMSModsPath}/CommissionModSettings.json", json);
         }
 
         public static void saveStats()
         {
-            File.Delete($"{ModDeclaration.Info.NCMSModsPath}/CommissionModSettings.json");
+            File.Delete($"{Core.NCMSModsPath}/CommissionModSettings.json");
             savedStats = new SavedStats();
             foreach (KeyValuePair<string, SavedTrait> kv in Traits.talentIDs)
             {
@@ -107,7 +107,7 @@ namespace CommissionMod
             savedStats.settingsVersion = correctSettingsVersion;
 
             string json = JsonConvert.SerializeObject(savedStats, Formatting.Indented);
-            File.WriteAllText($"{ModDeclaration.Info.NCMSModsPath}/CommissionModSettings.json", json);
+            File.WriteAllText($"{Core.NCMSModsPath}/CommissionModSettings.json", json);
 
             foreach (Actor actor in MapBox.instance.units.getSimpleList())
             {
