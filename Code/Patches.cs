@@ -39,8 +39,8 @@ namespace CommissionMod
             prefix: new HarmonyMethod(AccessTools.Method(typeof(Patches), "burningEffect_Prefix")));
             harmony.Patch(AccessTools.Method(typeof(WindowCreatureInfo), "OnEnable"), 
             postfix: new HarmonyMethod(AccessTools.Method(typeof(Patches), "OnEnable_Postfix")));
-            harmony.Patch(AccessTools.Method(typeof(ActorBase), "addTrait"), 
-            prefix: new HarmonyMethod(AccessTools.Method(typeof(Patches), "addTrait_Prefix")));
+            // harmony.Patch(AccessTools.Method(typeof(ActorBase), "addTrait"), 
+            // prefix: new HarmonyMethod(AccessTools.Method(typeof(Patches), "addTrait_Prefix")));
             harmony.Patch(AccessTools.Method(typeof(MapBox), "applyAttack"), 
             prefix: new HarmonyMethod(AccessTools.Method(typeof(Patches), "applyAttack_Prefix")));
             harmony.Patch(AccessTools.Method(typeof(Actor), "newKillAction"), 
